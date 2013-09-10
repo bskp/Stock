@@ -20,7 +20,7 @@ app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 def inject_profiler():
     return dict(profiler_includes=templatetags.profiler_includes())
 
-# Pull in URL dispatch routes
+# Pull in URL dispatch routes and their views
 import urls
 
 # Flask-DebugToolbar (only enabled when DEBUG=True)
