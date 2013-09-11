@@ -7,6 +7,8 @@ App Engine datastore models
 
 from google.appengine.ext import ndb
 
+# Categories for items
+CATEGORIES = ['outdoor','indoor','vehicle','merchandise', 'machines']
 
 class Item(ndb.Model):
     '''An item that can be bought or borrowed'''
@@ -21,10 +23,10 @@ class Item(ndb.Model):
     prices = ndb.FloatProperty(repeated=True)
 
     tax_per_day = ndb.BooleanProperty() # taxing option for e.g. cars
-    category = ndb.StringProperty(choices=['outdoor','indoor','vehicle','merchandise', 'machines'])
+    category = ndb.StringProperty(choices=CATEGORIES)
 
     def __repr__(self):
-        return "<Item %s>" % (self.name)
+        return u"<Item %s>" % (self.key.id())
 
 
 class Lend(ndb.Model):
@@ -44,10 +46,3 @@ class Lend(ndb.Model):
     date_end = ndb.DateProperty()
     date = ndb.DateProperty(auto_now_add=True)
 
-
-class ExampleModel(ndb.Model):
-    """Example Model"""
-    example_name = ndb.StringProperty(required=True)
-    example_description = ndb.TextProperty(required=True)
-    added_by = ndb.UserProperty()
-    timestamp = ndb.DateTimeProperty(auto_now_add=True)
