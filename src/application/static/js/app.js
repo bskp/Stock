@@ -1,3 +1,8 @@
+$(function() {
+  $('a[data-pjax]').pjax()
+})
+
+/*
 (function( app, $, undefined ) {
 
     dispatch = function( resource ){
@@ -73,3 +78,4 @@
     }
 
 }( window.app = window.app || {}, jQuery ));
+*/
