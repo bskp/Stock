@@ -1,7 +1,7 @@
 Stock
 =====
 
-A Flask-based, REST-y webshop for Google App Engine.
+A Flask-based webshop with pjax for Google App Engine.
 Built with:
 
 

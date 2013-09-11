@@ -1,8 +1,129 @@
-
-/* Main stylesheet */
-
-/* @section forms */
-.btn.cancel { margin-left: 0.5rem; }
-.nowrap { white-space: nowrap; }
-
-/* Your customizations here */
+@import "fonts.css";
+/**
+ * HasLayout
+ *
+ * Gives the element has-layout in IE. By switching to inline-block
+ * it will make the element haslayout, then we just switch it back.
+ * Alternatives are: zoom:1; overflow:anything; (IE7+), float, position:absolute;
+ *
+ * @see  http://www.satzansatz.de/cssd/onhavinglayout.html
+ * @type Mixin
+ */
+/**
+ * Quick Clearfix
+ *
+ * Clears an element of its floated children. The quick way.
+ */
+/**
+ * Clearfix
+ *
+ * Clears an element of its floated children.
+ */
+/**
+ * Sharpen an image if it has become blurry due to upscaling or downscaling
+ * Useful mainly in flat color images
+ * @see https://developer.mozilla.org/en/CSS/image-rendering
+ */
+/**
+ * When photos are upscaled or downscaled, they often get blurry. Don't use
+ * this on flat color images, they will still appear blurry.
+ * Use the +sharpen mixin instead.
+ * @see https://developer.mozilla.org/en/CSS/image-rendering
+ */
+/**
+ * Optimizes the rendering on images so they
+ * appear faster, but at a lower quality. Useful for <video>
+ */
+/**
+ * Reset
+ *
+ * Reset an elements margin and padding so it's
+ * easier to style.
+ *
+ * @type Mixin
+ */
+/**
+ * Reset Box
+ *
+ * Resets the entire box model for the element
+ *
+ * @type Mixin
+ */
+/**
+ * Reset all
+ *
+ * A more detailed reset, covering most properties
+ *
+ * @type Mixin
+ */
+/**
+ * Easier way to use border-radius
+ *
+ * @license BSD License
+ */
+/**
+ * Hides an elements off the page, but keeps it visible for accessibility
+ *
+ * @license BSD License
+ */
+body {
+  font-family: gyro;
+}
+#content {
+  position: relative;
+  background-color: #ffffff;
+  width: 600px;
+  margin: 0 auto;
+  -webkit-transition-property: margin;
+  -webkit-transition-duration: 1s;
+  -webkit-transition-timing-function: linear;
+  -moz-transition-property: margin;
+  -moz-transition-duration: 1s;
+  -moz-transition-timing-function: linear;
+  -ms-transition-property: margin;
+  -ms-transition-duration: 1s;
+  -ms-transition-timing-function: linear;
+  -o-transition-property: margin;
+  -o-transition-duration: 1s;
+  -o-transition-timing-function: linear;
+  transition-property: margin;
+  transition-duration: 1s;
+  transition-timing-function: linear;
+}
+#modal {
+  width: 600px;
+  margin: 0 auto;
+  padding: 10px;
+  -webkit-box-shadow: #666 0 2px 30px;
+  -moz-box-shadow: #666 0 2px 30px;
+  box-shadow: #666 0 2px 30px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+}
+a {
+  text-decoration: none;
+  color: #000000;
+}
+a:hover {
+  text-decoration: underline;
+}
+#tools a {
+  display: block;
+}
+textarea,
+input,
+select {
+  font-weight: inherit;
+  text-transform: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  border-style: none;
+  margin: 0;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+}

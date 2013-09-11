@@ -1,0 +1,41 @@
+/**
+ * HasLayout
+ *
+ * Gives the element has-layout in IE. By switching to inline-block
+ * it will make the element haslayout, then we just switch it back.
+ * Alternatives are: zoom:1; overflow:anything; (IE7+), float, position:absolute;
+ *
+ * @see  http://www.satzansatz.de/cssd/onhavinglayout.html
+ * @type Mixin
+ */
+.has-layout() {
+	zoom: 1;
+}
+
+/**
+ * Quick Clearfix
+ *
+ * Clears an element of its floated children. The quick way.
+ */
+.clear() {
+	overflow: auto;
+}
+
+/**
+ * Clearfix
+ *
+ * Clears an element of its floated children.
+ */
+.clearfix() {
+	.has-layout;
+	display: block;
+
+	&:after {
+		content: '\\0020';
+		display: block;
+		height: 0;
+		clear: both;
+		visibility: hidden;
+		font-size: 0;
+	}
+}

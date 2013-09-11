@@ -1,0 +1,5 @@
+<ul id="list">
+    {% for item in items %}
+    <li><a href="{{ url_for('item', id=item.key.id()) }}"><h3>{{ item.name }}</h3></a></li>
+    {% endfor %}
+</ul>

@@ -21,31 +21,14 @@ def inject_profiler():
     return dict(profiler_includes=templatetags.profiler_includes())
 
 
-def request_wants_json():
-    best = request.accept_mimetypes \
-        .best_match(['application/json', 'text/html'])
-    return best == 'application/json' and \
-        request.accept_mimetypes[best] > \
-        request.accept_mimetypes['text/html']
+def pjax(template, **kwargs):
+    """Determine whether the request was made by PJAX."""
+    if "X-PJAX" in request.headers:
+        return render_template(template)
+    return render_template("base.html", template=template, **kwargs)
 
 
-def render(data, status=200):
-    if not request_wants_json():
-        # on loading the app, the current resource will be re-requested with
-        # a json-requesting header
-        return render_template('app.html')
-
-    try:
-        response = jsonify(data)
-    except:
-        data = {d.key.id(): d.to_dict() for d in data}
-        response = jsonify(data)
-
-    response.status_code = status
-
-    return response
-
-
+# A Helper function
 def make_url_safe(string):
     from unidecode import unidecode
     from werkzeug.urls import url_fix

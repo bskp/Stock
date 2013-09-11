@@ -1,41 +1,66 @@
-<!DOCTYPE html>
-<html lang="en" class="no-js">
-{% set bootstrap_version = '2.3.1' %}
-{% set modernizer_version = '2.6.2' %}
-{% set jquery_version = '1.9.1' %}
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
-    <title>{% block title%}Flask on App Engine{% endblock %}</title>
-    <link href="/static/css/bootstrap-{{ bootstrap_version }}.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-    <style> body { padding-top: 90px; } </style> <!-- Bootstrap -->
-    <link href="/static/css/main.css" rel="stylesheet" />
-    <link rel="shortcut icon" href="/static/img/favicon.ico" />
-    {% block style_block %}{# page-specific CSS #}{% endblock %}
-    <script src="/static/js/lib/modernizr-{{ modernizer_version }}.min.js"></script>{# Modernizr must be here, above body tag. #}
-    {% block head_script %}{# defer-incapable JS block #}{% endblock %}
-</head>
-<body>
-    <div id="header">
-        {% include 'includes/nav.html' %} {# pull in navbar #}
-    </div>
-    <div class="container" id="maincontent">
-        {% include 'includes/flash_message.html' %} {# page-level feedback notices #}
-        <div id="body_content">
-            {% block content %}{# main content area #}{% endblock %}
+<!DOCTYPE xhtml>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+	<head>
+		<title>Stock</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; user-scalable=no;" />
+        <link rel="apple-touch-icon-precomposed" href="{{ url_for('static', filename='img/favicon.png') }}" /> 
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+		<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <script type="text/javascript"> $ROOT = {{ request.script_root|tojson|safe }}; </script>
+        <script src="{{ url_for('static', filename='js/jquery.pjax.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+        <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/png" />
+        <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" type="text/css" />
+
+        {# Date Picker #}
+        <script type="text/javascript" src="static/js/zebra_datepicker.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename="js/zebra_datepicker.css") }}" type="text/css">
+	</head>
+	<body>
+        <h1>Shoppedi-shop!</h1>
+        <div id="nav">
+            <span>Preisgruppe</span>
+            <select name="group">
+                <option value="int">JuBla-Schar</option>
+                <option value="ext">nichtkommerzieller Jugendverein</option>
+                <option value="com">Sportverein</option>
+            </select>
+
+            <span>Zeitraum</span>
+            <input type="text" name="from" id="from">
+            <input type="text" name="until" id="until">
+
+            <span>Kategorie</span>
+            <select name="category">
+                <option value="">(alles)</option>
+                <option value="outdoor">draussen</option>
+                <option value="indoor">drinnen</option>
+                <option value="vehicle">vehikel</option>
+                <option value="merchandise">fan-artikel</option>
+                <option value="machines">maschinen</option>
+            </select>
+
+            {# TODO: remove #}
+            {% if not session.logged_in %}
+              <a href="{{ url_for('login') }}" target="get">log in</a>
+            {% else %}
+              <a href="{{ url_for('logout') }}">log out</a>
+            {% endif %}
         </div>
-    </div><!-- /container -->
-    <footer>
-        <div id="footer" class="container">
-            {% block footer %}{% endblock %}
-        </div><!-- /footer -->
-    </footer>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/{{ jquery_version }}/jquery.min.js"></script>
-    <script src="/static/js/lib/bootstrap-{{ bootstrap_version }}.min.js"></script>
-    <script src="/static/js/main.js"></script>
-    {% block tail_script %}{# defer-capable JS block #}{% endblock %}
-    {{ profiler_includes|safe }}
-</body>
+
+        <div id="flash">
+            {% for category, message in get_flashed_messages(with_categories=True) %}
+            <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+
+        <div id="content">{% include template %}</div>
+        <div id="modal"></div>
+	</body>
 </html>

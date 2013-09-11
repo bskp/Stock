@@ -1,0 +1,74 @@
+// Include webfonts
+@import "fonts.css";
+
+// Include mixins
+@import "mixins.less";
+
+@yellow: #fff44f;
+@black: #000;
+@white: #fff;
+
+// Layout
+body{
+    font-family: gyro;
+}
+
+#content{
+    position: relative;
+    background-color: @white;
+    width: 600px;
+    margin: 0 auto;
+
+    .transition(margin, 1s, linear);
+}
+
+
+#modal{
+    width: 600px;
+    margin: 0 auto;
+    padding: 10px;
+    .box-shadow(~"#666 0 2px 30px");
+    .border-radius(5px);
+}
+
+
+// Typo
+
+body{
+}
+
+h1,h2,h3{
+}
+
+
+h1{
+}
+
+h2{
+}
+
+a{
+    text-decoration: none;
+    color: @black;
+
+    &:hover{
+        text-decoration: underline;
+    }
+
+    #tools &{
+        display: block;
+    }
+}
+
+textarea, input, select{
+	font-weight: inherit;
+	text-transform: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	font-style: inherit;
+	border-style: none;
+    margin: 0;
+    letter-spacing: inherit;
+    word-spacing: inherit;
+}
+
