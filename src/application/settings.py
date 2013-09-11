@@ -12,6 +12,9 @@ import os
 
 from secret_keys import CSRF_SECRET_KEY, SESSION_KEY
 
+# Settings for image uploads
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 DEBUG_MODE = False
 

@@ -1,3 +1,10 @@
+Stock
+=====
+
+A Flask-based, REST-y webshop for Google App Engine.
+Built with:
+
+
 Flask on App Engine Project Template
 ====================================
 

@@ -28,6 +28,12 @@ class Item(ndb.Model):
     def __repr__(self):
         return u"<Item %s>" % (self.key.id())
 
+    def in_stock(date):
+        ''' Returns the amount in stock on a given date '''
+        lends = Lend.query(Lend.date_end < date, Lend.date_start > date).fetch()
+        counts = [l.count for l in lends if key.id() in l.items]
+        return count - sum(counts)
+
 
 class Lend(ndb.Model):
     '''Whenever an item is borrowed or bought, a lend entity is created'''

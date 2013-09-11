@@ -35,7 +35,12 @@ def render(data, status=200):
         # a json-requesting header
         return render_template('app.html')
 
-    response = jsonify(data)
+    try:
+        response = jsonify(data)
+    except:
+        data = {d.key.id(): d.to_dict() for d in data}
+        response = jsonify(data)
+
     response.status_code = status
 
     return response

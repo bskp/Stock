@@ -12,7 +12,8 @@ from google.appengine.api import users
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
 
-from flask import request, render_template, flash, url_for, redirect
+from flask import request, render_template, flash, url_for, redirect, send_from_directory
+from werkzeug import secure_filename
 
 from flask_cache import Cache
 
@@ -39,7 +40,7 @@ def list(query=None):
     if not query:
         query = Item.query()
 
-    return render({'list': query.fetch()}, 200)
+    return render(query.fetch(), 200)
 
 
 @app.route('/list/<string:category>')
@@ -55,25 +56,49 @@ def list_date(start, end):
     pass
 
 
-@app.route('/item', methods=['POST', 'GET'])
-def item_create():
-    url_safe_name = make_url_safe(request.form.get('name'))
-    item = Item(id = url_safe_name,
-                name = request.form.get('name'),
-                description = request.form.get('description'),
-                count = int(request.form.get('count')) if request.form.get('count') else 1,
-                prices = [float(request.form.get('price_int')) if request.form.get('price_int') else 0,
-                          float(request.form.get('price_ext')) if request.form.get('price_ext') else 0,
-                          float(request.form.get('price_com')) if request.form.get('price_com') else 0,
-                          float(request.form.get('price_buy')) if request.form.get('price_buy') else 0,
-                          ],
-                tax_per_day = True if request.form.get('tax_per_day') else False,
-                category = request.form.get('category'),
-                )
+@app.route('/item/<id>', methods=['GET', 'DELETE', 'PATCH'])
+def item_do(id):
+    key = ndb.Key('Item', id) 
+
+    if request.method == 'DELETE':
+        key.delete()
+        return render({'deleted': id})
+
+    if request.method == 'GET':
+        item = key.get()
+        return render([item])
+
+    if request.method == 'PATCH':
+        return item_create(key)
+
+
+@app.route('/item', methods=['POST'])
+def item_create(replace_key=None):
+    if replace_key:
+        item = replace_key.get()
+    else:
+        url_safe_name = make_url_safe(request.form.get('name'))
+        item = Item(id = url_safe_name)
+        
+    item.populate(
+        name = request.form.get('name'),
+        description = request.form.get('description'),
+        count = int(request.form.get('count')) if request.form.get('count') else 1,
+        prices = [float(request.form.get('price_int')) if request.form.get('price_int') else 0,
+                  float(request.form.get('price_ext')) if request.form.get('price_ext') else 0,
+                  float(request.form.get('price_com')) if request.form.get('price_com') else 0,
+                  float(request.form.get('price_buy')) if request.form.get('price_buy') else 0,
+                  ],
+        tax_per_day = True if request.form.get('tax_per_day') else False,
+        category = request.form.get('category'),
+        )
     id = item.put().id()
-    return render({'created': id}, 200)
+    return render({'created': id})
 
 
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 '''
 def home():
