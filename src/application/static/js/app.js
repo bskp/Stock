@@ -1,5 +1,5 @@
 $(function() {
-  $('a[data-pjax]').pjax()
+  targets = $('a[data-pjax]').pjax();
 })
 
 /*

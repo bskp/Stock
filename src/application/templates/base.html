@@ -19,32 +19,35 @@
         <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" type="text/css" />
 
         {# Date Picker #}
-        <script type="text/javascript" src="static/js/zebra_datepicker.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename="js/zebra_datepicker.js") }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename="js/zebra_datepicker.css") }}" type="text/css">
 	</head>
 	<body>
         <h1>Shoppedi-shop!</h1>
         <div id="nav">
-            <span>Preisgruppe</span>
+            <h4>Filter:</h4> 
+            Verfügbar vom
+            <input type="text" name="from" id="from">
+            bis
+            <input type="text" name="until" id="until">
+
+            Kategorie
+            <select name="category">
+                <option value="">(alles)</option>
+                <option value="outdoor">Draussen</option>
+                <option value="indoor">Drinnen</option>
+                <option value="vehicle">Vehikel</option>
+                <option value="merchandise">Fan-Artikel</option>
+                <option value="machines">Maschinen</option>
+            </select>
+
+            <span>Tarife für</span>
             <select name="group">
                 <option value="int">JuBla-Schar</option>
                 <option value="ext">nichtkommerzieller Jugendverein</option>
                 <option value="com">Sportverein</option>
             </select>
 
-            <span>Zeitraum</span>
-            <input type="text" name="from" id="from">
-            <input type="text" name="until" id="until">
-
-            <span>Kategorie</span>
-            <select name="category">
-                <option value="">(alles)</option>
-                <option value="outdoor">draussen</option>
-                <option value="indoor">drinnen</option>
-                <option value="vehicle">vehikel</option>
-                <option value="merchandise">fan-artikel</option>
-                <option value="machines">maschinen</option>
-            </select>
 
             {# TODO: remove #}
             {% if not session.logged_in %}

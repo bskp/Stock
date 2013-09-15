@@ -1,0 +1,18 @@
+<form action="{{ url_for('item_create') }}" method="post">
+<h1><input name="name" value="{{item.name}}" placeholder="Name" /></h1>
+<div id="info">
+    <input name="count" value="{{item.count}}" placeholder="Anzahl" />×
+    Fr. <input name="count" value="{{item.count}}" placeholder="intern" />
+    Fr. <input name="count" value="{{item.count}}" placeholder="extern" />
+    Fr. <input name="count" value="{{item.count}}" placeholder="kommerziell" />
+    Fr. <input name="count" value="{{item.count}}" placeholder="Kaufpreis" />
+    Preis pro <select name="precise_tax">
+        <option value="0">Woche</option>
+        <option value="1">Tag</option>
+    </select>
+</div>
+
+<p id="description"><textarea name="description" placeholder="Beschreibung">{{item.description}}</textarea></p>
+
+<input type="submit" name="ok" value="OK" />
+</form>

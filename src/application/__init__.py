@@ -24,7 +24,7 @@ def inject_profiler():
 def pjax(template, **kwargs):
     """Determine whether the request was made by PJAX."""
     if "X-PJAX" in request.headers:
-        return render_template(template)
+        return render_template(template, **kwargs)
     return render_template("base.html", template=template, **kwargs)
 
 
@@ -38,6 +38,7 @@ def make_url_safe(string):
 # Pull in URL dispatch routes and their views
 import views
 
+'''
 # Flask-DebugToolbar (only enabled when DEBUG=True)
 toolbar = DebugToolbarExtension(app)
 
@@ -46,4 +47,5 @@ if app.debug:
     app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
 
 # GAE Mini Profiler (only enabled on dev server)
-app.wsgi_app = profiler.ProfilerWSGIMiddleware(app.wsgi_app)
+# app.wsgi_app = profiler.ProfilerWSGIMiddleware(app.wsgi_app)
+'''

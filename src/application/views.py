@@ -65,8 +65,11 @@ def item(id):
         return pjax('detail.html', item=key.get())
 
 
-@app.route('/item', methods=['POST'])
+@app.route('/item_create', methods=['GET', 'POST'])
 def item_create(replace_key=None):
+    if request.method == 'GET':
+        return pjax('create_item.html', item=None)
+    # Else POST: save to db
     if replace_key:
         item = replace_key.get()
     else:
@@ -86,15 +89,15 @@ def item_create(replace_key=None):
         category = request.form.get('category'),
         )
     id = item.put().id()
-
     '''
     file = request.files['file']
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    #TODO
+    #return pjax('flash.html', 'success', '"%s" gesichert!'%id)
     '''
-
-    return pjax('flash.html', 'success', '"%s" gesichert!'%id)
+    return 'gesichert.'
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -786,7 +786,7 @@ function enable() {
   $.pjax.submit = handleSubmit
   $.pjax.reload = pjaxReload
   $.pjax.defaults = {
-    timeout: 650,
+      timeout: 2000, //TODO undo to reasonable amount (650?)
     push: true,
     replace: false,
     type: 'GET',
