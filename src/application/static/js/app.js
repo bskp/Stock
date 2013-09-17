@@ -1,6 +1,23 @@
 $(function() {
-  targets = $('a[data-pjax]').pjax();
+    targets = $('a[data-pjax]').pjax();
+
+    $(document).ready(function(){
+            config = {
+                        days: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+                        months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                        show_select_today: false,
+                        show_clear_date: false,
+                        show_icon: false,
+                        direction: true,
+                        format: 'j. M Y'
+                     };
+        
+            $('#from.datepicker').Zebra_DatePicker( $.extend(config, {pair: $('#until')}) );
+            $('#until.datepicker').Zebra_DatePicker(config);
+    }) // document.ready
+    
 })
+
 
 /*
 (function( app, $, undefined ) {

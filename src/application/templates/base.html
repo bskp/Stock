@@ -1,4 +1,4 @@
-<!DOCTYPE xhtml>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
 	<head>
 		<title>Stock</title>
@@ -16,54 +16,58 @@
         <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 
         <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/png" />
-        <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" type="text/css" />
 
         {# Date Picker #}
         <script type="text/javascript" src="{{ url_for('static', filename="js/zebra_datepicker.js") }}"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename="js/zebra_datepicker.css") }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename="css/datepicker.css") }}" type="text/css">
 	</head>
 	<body>
-        <h1>Shoppedi-shop!</h1>
-        <div id="nav">
-            <h4>Filter:</h4> 
-            Verfügbar vom
-            <input type="text" name="from" id="from">
-            bis
-            <input type="text" name="until" id="until">
-
-            Kategorie
-            <select name="category">
-                <option value="">(alles)</option>
-                <option value="outdoor">Draussen</option>
-                <option value="indoor">Drinnen</option>
+        <header>
+            <h1>RAST-Spielmaterialverleih</h1>
+            <span class="select"><select name="category">
+                <option value="">Alle Artikel</option>
+                <option value="outdoor">Spielmaterial draussen</option>
+                <option value="indoor">Spielmaterial drinnen</option>
                 <option value="vehicle">Vehikel</option>
                 <option value="merchandise">Fan-Artikel</option>
                 <option value="machines">Maschinen</option>
-            </select>
+            </select></span>
 
-            <span>Tarife für</span>
-            <select name="group">
+            verfügbar vom
+            <input type="text" class="datepicker" name="from" id="from">
+            bis
+            <input type="text" class="datepicker" name="until" id="until">
+
+            <a class="btn" id="reset"><i class="icon-remove-sign"></i></a>
+
+            <!--
+            Tarife für
+            <span class="select"><select name="group">
                 <option value="int">JuBla-Schar</option>
                 <option value="ext">nichtkommerzieller Jugendverein</option>
                 <option value="com">Sportverein</option>
-            </select>
+            </select></span>
+            --!>
+            <input style="float:right;" type="text" placeholder="Suche"/>
 
 
+            <!--
             {# TODO: remove #}
             {% if not session.logged_in %}
               <a href="{{ url_for('login') }}" target="get">log in</a>
             {% else %}
               <a href="{{ url_for('logout') }}">log out</a>
             {% endif %}
-        </div>
+            --!>
+        </header>
 
-        <div id="flash">
+        <aside id="flash">
             {% for category, message in get_flashed_messages(with_categories=True) %}
             <div class="flash {{ category }}">{{ message }}</div>
             {% endfor %}
-        </div>
+        </aside>
 
-        <div id="content">{% include template %}</div>
-        <div id="modal"></div>
+        <section id="content">{% include template %}</section>
 	</body>
 </html>

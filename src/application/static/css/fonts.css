@@ -46,3 +46,31 @@
     font-style: italic;
 
 }
+
+
+@font-face {
+    font-family: 'kaushan';
+    src: url('../fonts/kaushanscript-regular-webfont.eot');
+    src: url('../fonts/kaushanscript-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/kaushanscript-regular-webfont.woff') format('woff'),
+         url('../fonts/kaushanscript-regular-webfont.ttf') format('truetype'),
+         url('../fonts/kaushanscript-regular-webfont.svg#kaushan_scriptregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'speciale';
+    src: url('../fonts/specialelite-webfont.eot');
+    src: url('../fonts/specialelite-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/specialelite-webfont.woff') format('woff'),
+         url('../fonts/specialelite-webfont.ttf') format('truetype'),
+         url('../fonts/specialelite-webfont.svg#special_eliteregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}

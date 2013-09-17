@@ -1,25 +1,47 @@
 // Include webfonts
 @import "fonts.css";
 
+// Include icons (font awesome)
+@import "font-awesome.less";
+
 // Include mixins
 @import "mixins.less";
 
 @yellow: #fff44f;
 @black: #000;
 @white: #fff;
+@gray: #777;
+
+
+
+@text:          @black;
+@text_header:   @white;
+
 
 // Layout
 body{
-    font-family: gyro;
+    background-color: @white;
+    margin: 0 auto;
+    color: @text;
+}
+
+header{
+    h1{
+        text-transform: uppercase;
+        font-size: 20px;
+        margin: 0;
+        color: #fff;
+    }
+
+    input, select{ color: #fff; }
+
+    background-color: @gray;
+    color: #aaa;
+    padding: 0 1em 4px 1em;
 }
 
 #content{
-    position: relative;
-    background-color: @white;
-    width: 600px;
-    margin: 0 auto;
-
-    .transition(margin, 1s, linear);
+    padding: 0 1em;
 }
 
 
@@ -34,7 +56,9 @@ body{
 
 // Typo
 
+
 body{
+    font-family: gyro;
 }
 
 h1,h2,h3{
@@ -54,10 +78,6 @@ a{
     &:hover{
         text-decoration: underline;
     }
-
-    #tools &{
-        display: block;
-    }
 }
 
 textarea, input, select{
@@ -67,8 +87,74 @@ textarea, input, select{
 	font-size: inherit;
 	font-style: inherit;
 	border-style: none;
-    margin: 0;
+    border-bottom: 2px solid @text_header;
     letter-spacing: inherit;
     word-spacing: inherit;
+    background: transparent;
+    color: inherit;
 }
 
+// Wrapper to get rid of glitter
+.select select {
+    border-radius: 0;
+    -webkit-appearance: none;
+   }
+
+
+
+// Element classes
+
+//      UI
+input.datepicker{
+    width: 7em;
+    text-align: center;
+    cursor: text;
+}
+
+.btn{
+    cursor: pointer;
+
+    &:hover{
+        text-decoration: none;
+    }
+}
+
+.btn#reset{
+    color: #aaa;
+}
+
+ul.items{
+    padding: 0;
+
+    li {
+        display: inline;
+        float: left;
+        margin: 0 10px 10px 0;
+
+        a {
+            width: 140px;
+            height: 140px;
+            .border-radius(5px);
+
+            background-color: #bbb;
+            
+            // Align inline text:
+            display: table-cell;
+            vertical-align: bottom;
+            text-align: center;
+
+            span {
+                width: 100%;
+                display: inline-block;
+                background-color: rgba( 255,255,255, 0.4);;
+            }
+        }
+    }
+
+    li.collapsed a{
+        width: 0px;
+        .transition(all, 1s)
+    }
+        
+
+}
