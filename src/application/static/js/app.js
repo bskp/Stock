@@ -12,12 +12,16 @@ $(function() {
                         format: 'j. M Y'
                      };
         
-            $('#from.datepicker').Zebra_DatePicker( $.extend(config, {pair: $('#until')}) );
+            $('#from.datepicker').Zebra_DatePicker(config);
             $('#until.datepicker').Zebra_DatePicker(config);
     }) // document.ready
     
-})
+    // Provide "deselecting"/
+    $(document).on('click', 'body', function(){
+        $('#sidebar').empty();
+    }); 
 
+})
 
 /*
 (function( app, $, undefined ) {

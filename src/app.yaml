@@ -39,5 +39,8 @@ handlers:
 - url: /static
   static_dir: application/static
 
+- url: /uploads
+  static_dir: application/uploads
+
 - url: .*
   script: run.application.app

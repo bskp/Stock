@@ -11,18 +11,25 @@
 @black: #000;
 @white: #fff;
 @gray: #777;
+@gray_light: #ddd;
+@accent: #00A7DB;
 
 
 
 @text:          @black;
 @text_header:   @white;
 
+// Resets
+
+.html5-reset();
+
 
 // Layout
 body{
-    background-color: @white;
+    background-color: @gray_light;
     margin: 0 auto;
     color: @text;
+    min-width: 777px;
 }
 
 header{
@@ -34,23 +41,37 @@ header{
     }
 
     input, select{ color: #fff; }
+    input::-webkit-input-placeholder{ color: @black; }
 
-    background-color: @gray;
-    color: #aaa;
-    padding: 0 1em 4px 1em;
+    background-color: @accent;
+    color: @black;
+    padding: 0 1em 0.4em 1em;
 }
 
 #content{
     padding: 0 1em;
 }
 
+#sidebar{
+    float: right;
+    background-color: @white;
+    height: 100%;
+    padding: 1em;
+    
+    border-left: solid 1px rgba(0, 0, 0, 0.1);
+
+    h1{
+        width: 423px;
+    }
+}
+body,html{ height: 100%; }
 
 #modal{
     width: 600px;
     margin: 0 auto;
     padding: 10px;
     .box-shadow(~"#666 0 2px 30px");
-    .border-radius(5px);
+    .border-radius(3px);
 }
 
 
@@ -92,9 +113,10 @@ textarea, input, select{
     word-spacing: inherit;
     background: transparent;
     color: inherit;
+    //.placeholder(@black);
 }
 
-// Wrapper to get rid of glitter
+// Select-wrapper to get rid of glitter
 .select select {
     border-radius: 0;
     -webkit-appearance: none;
@@ -106,7 +128,7 @@ textarea, input, select{
 
 //      UI
 input.datepicker{
-    width: 7em;
+    width: 6em;
     text-align: center;
     cursor: text;
 }
@@ -117,10 +139,6 @@ input.datepicker{
     &:hover{
         text-decoration: none;
     }
-}
-
-.btn#reset{
-    color: #aaa;
 }
 
 ul.items{
@@ -135,26 +153,90 @@ ul.items{
             width: 140px;
             height: 140px;
             .border-radius(5px);
+            border-bottom: solid 1px rgba(0, 0, 0, 0.1);
 
             background-color: #bbb;
+            background-size: cover;
+            background-position: center;
             
             // Align inline text:
             display: table-cell;
             vertical-align: bottom;
             text-align: center;
 
+            // Hide unrounded corners of the span
+            overflow: hidden;
+
             span {
                 width: 100%;
                 display: inline-block;
-                background-color: rgba( 255,255,255, 0.4);;
+                background-color: @white;
+                line-height: 0.9em;
+                padding: 0.5em 0;
             }
-        }
-    }
+        } // a
+    } // li
+} // ul.items
 
-    li.collapsed a{
-        width: 0px;
-        .transition(all, 1s)
-    }
-        
 
+// Zebra Datepicker
+
+.Zebra_DatePicker *,
+.Zebra_DatePicker *:after,
+.Zebra_DatePicker *:before  { -moz-box-sizing: content-box !important; -webkit-box-sizing: content-box !important; box-sizing: content-box !important }
+
+.Zebra_DatePicker{ 
+    position: absolute; 
+    background: #FFF; 
+    display: none; 
+    z-index: 100; 
+    padding: 5px; 
 }
+
+.Zebra_DatePicker *         { margin: 0; padding: 0; color: #373737; background: transparent; border: none }
+
+
+.Zebra_DatePicker table                      { border-collapse: collapse; border-spacing: 0 }
+
+.Zebra_DatePicker td,
+.Zebra_DatePicker th                         { text-align: center; padding: 0 }
+
+.Zebra_DatePicker td                         { cursor: pointer }
+
+.Zebra_DatePicker .dp_daypicker              { margin-top: 3px }
+
+.Zebra_DatePicker .dp_daypicker td,
+.Zebra_DatePicker .dp_daypicker th           { width: 30px }
+
+.Zebra_DatePicker,
+.Zebra_DatePicker .dp_header .dp_hover,
+.Zebra_DatePicker td.dp_selected,
+.Zebra_DatePicker .dp_footer .dp_hover,
+.Zebra_DatePicker td.dp_hover               { .border-radius(2px) }
+
+
+
+.Zebra_DatePicker .dp_header td             { }
+
+.Zebra_DatePicker .dp_header .dp_previous,
+.Zebra_DatePicker .dp_header .dp_next       { width: 30px }
+
+.Zebra_DatePicker .dp_header .dp_caption    { font-weight: bold }
+.Zebra_DatePicker .dp_header .dp_hover      { background: #DEDEDE; color: #373737 }
+.Zebra_DatePicker .dp_header .dp_blocked    { color: #DEDEDE; cursor: default }
+
+
+.Zebra_DatePicker .dp_daypicker th              { font-weight: bold }
+.Zebra_DatePicker td.dp_not_in_month            { color: #DEDEDE; cursor: default }
+.Zebra_DatePicker td.dp_not_in_month_selectable { }
+.Zebra_DatePicker td.dp_weekend                 { }
+.Zebra_DatePicker td.dp_weekend_disabled        { color: #DEDEDE; cursor: default }
+.Zebra_DatePicker td.dp_selected                { background: @accent; color: #FFF !important }
+.Zebra_DatePicker td.dp_week_number             { cursor: text; font-weight: bold }
+
+
+.Zebra_DatePicker td.dp_current             { color: @accent }
+.Zebra_DatePicker td.dp_disabled_current    { color: @accent }
+.Zebra_DatePicker td.dp_disabled            { color: #DEDEDE; cursor: default }
+.Zebra_DatePicker td.dp_hover               { background: #DEDEDE }
+

@@ -32,7 +32,7 @@ def pjax(template, **kwargs):
 def make_url_safe(string):
     from unidecode import unidecode
     from werkzeug.urls import url_fix
-    return url_fix( unidecode( string ) )
+    return url_fix( unidecode( string.replace(' ', '_') ) )
 
 
 # Pull in URL dispatch routes and their views

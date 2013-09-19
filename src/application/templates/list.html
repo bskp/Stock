@@ -1,6 +1,13 @@
 <ul class="items">
     {% for item in items %}
-    <li><a href="{{ url_for('item', id=item.key.id()) }}" data-pjax="#content" title="{{ item.description }}"><span>{{ item.name }}</span></a></li>
+    <li><a href="{{ url_for('item', id=item.key.id()) }}"
+        data-pjax="#sidebar"
+        title="{{ item.description }}"
+        style="background-image: url('uploads/{{ item.key.id() }}.jpg');">
+
+        <span>{{ item.name }}</span>
+    </a></li>
     {% endfor %}
-    <a href="{{ url_for('item_create') }}" data-pjax="#content">Hinzufügen</a>
+
+    <a href="{{ url_for('item_create') }}" data-pjax="#sidebar">Hinzufügen</a>
 </ul>

@@ -122,13 +122,6 @@ def logout():
     return redirect(url_for('show_things'))
 
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
-
-
 
 
 def warmup():
@@ -143,6 +136,7 @@ def warmup():
 # See http://code.google.com/appengine/docs/python/config/appconfig.html#Warming_Requests
 app.add_url_rule('/_ah/warmup', 'warmup', view_func=warmup)
 
+'''
 ## Error handlers
 # Handle 404 errors
 @app.errorhandler(404)
@@ -153,3 +147,4 @@ def page_not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return render_template('500.html'), 500
+'''

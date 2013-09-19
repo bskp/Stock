@@ -1467,15 +1467,32 @@ a .icon-flip-vertical:before {
  *
  * @license BSD License
  */
+nav,
+section,
+article,
+header,
+aside,
+footer,
+figure,
+dialog {
+  display: block;
+}
+time,
+progress,
+mark,
+output {
+  display: inline;
+}
 body {
-  background-color: #ffffff;
+  background-color: #dddddd;
   margin: 0 auto;
   color: #000000;
+  min-width: 777px;
 }
 header {
-  background-color: #777777;
-  color: #aaa;
-  padding: 0 1em 4px 1em;
+  background-color: #00a7db;
+  color: #000000;
+  padding: 0 1em 0.4em 1em;
 }
 header h1 {
   text-transform: uppercase;
@@ -1487,8 +1504,25 @@ header input,
 header select {
   color: #fff;
 }
+header input::-webkit-input-placeholder {
+  color: #000000;
+}
 #content {
   padding: 0 1em;
+}
+#sidebar {
+  float: right;
+  background-color: #ffffff;
+  height: 100%;
+  padding: 1em;
+  border-left: solid 1px rgba(0, 0, 0, 0.1);
+}
+#sidebar h1 {
+  width: 423px;
+}
+body,
+html {
+  height: 100%;
 }
 #modal {
   width: 600px;
@@ -1497,9 +1531,9 @@ header select {
   -webkit-box-shadow: #666 0 2px 30px;
   -moz-box-shadow: #666 0 2px 30px;
   box-shadow: #666 0 2px 30px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
@@ -1534,7 +1568,7 @@ select {
   -webkit-appearance: none;
 }
 input.datepicker {
-  width: 7em;
+  width: 6em;
   text-align: center;
   cursor: text;
 }
@@ -1543,9 +1577,6 @@ input.datepicker {
 }
 .btn:hover {
   text-decoration: none;
-}
-.btn#reset {
-  color: #aaa;
 }
 ul.items {
   padding: 0;
@@ -1564,31 +1595,118 @@ ul.items li a {
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.1);
   background-color: #bbb;
+  background-size: cover;
+  background-position: center;
   display: table-cell;
   vertical-align: bottom;
   text-align: center;
+  overflow: hidden;
 }
 ul.items li a span {
   width: 100%;
   display: inline-block;
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: #ffffff;
+  line-height: 0.9em;
+  padding: 0.5em 0;
 }
-ul.items li.collapsed a {
-  width: 0px;
-  -webkit-transition-property: all;
-  -webkit-transition-duration: 1s;
-  -webkit-transition-timing-function: ease-in-out;
-  -moz-transition-property: all;
-  -moz-transition-duration: 1s;
-  -moz-transition-timing-function: ease-in-out;
-  -ms-transition-property: all;
-  -ms-transition-duration: 1s;
-  -ms-transition-timing-function: ease-in-out;
-  -o-transition-property: all;
-  -o-transition-duration: 1s;
-  -o-transition-timing-function: ease-in-out;
-  transition-property: all;
-  transition-duration: 1s;
-  transition-timing-function: ease-in-out;
+.Zebra_DatePicker *,
+.Zebra_DatePicker *:after,
+.Zebra_DatePicker *:before {
+  -moz-box-sizing: content-box !important;
+  -webkit-box-sizing: content-box !important;
+  box-sizing: content-box !important;
+}
+.Zebra_DatePicker {
+  position: absolute;
+  background: #FFF;
+  display: none;
+  z-index: 100;
+  padding: 5px;
+}
+.Zebra_DatePicker * {
+  margin: 0;
+  padding: 0;
+  color: #373737;
+  background: transparent;
+  border: none;
+}
+.Zebra_DatePicker table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.Zebra_DatePicker td,
+.Zebra_DatePicker th {
+  text-align: center;
+  padding: 0;
+}
+.Zebra_DatePicker td {
+  cursor: pointer;
+}
+.Zebra_DatePicker .dp_daypicker {
+  margin-top: 3px;
+}
+.Zebra_DatePicker .dp_daypicker td,
+.Zebra_DatePicker .dp_daypicker th {
+  width: 30px;
+}
+.Zebra_DatePicker,
+.Zebra_DatePicker .dp_header .dp_hover,
+.Zebra_DatePicker td.dp_selected,
+.Zebra_DatePicker .dp_footer .dp_hover,
+.Zebra_DatePicker td.dp_hover {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+}
+.Zebra_DatePicker .dp_header .dp_previous,
+.Zebra_DatePicker .dp_header .dp_next {
+  width: 30px;
+}
+.Zebra_DatePicker .dp_header .dp_caption {
+  font-weight: bold;
+}
+.Zebra_DatePicker .dp_header .dp_hover {
+  background: #DEDEDE;
+  color: #373737;
+}
+.Zebra_DatePicker .dp_header .dp_blocked {
+  color: #DEDEDE;
+  cursor: default;
+}
+.Zebra_DatePicker .dp_daypicker th {
+  font-weight: bold;
+}
+.Zebra_DatePicker td.dp_not_in_month {
+  color: #DEDEDE;
+  cursor: default;
+}
+.Zebra_DatePicker td.dp_weekend_disabled {
+  color: #DEDEDE;
+  cursor: default;
+}
+.Zebra_DatePicker td.dp_selected {
+  background: #00a7db;
+  color: #ffffff !important;
+}
+.Zebra_DatePicker td.dp_week_number {
+  cursor: text;
+  font-weight: bold;
+}
+.Zebra_DatePicker td.dp_current {
+  color: #00a7db;
+}
+.Zebra_DatePicker td.dp_disabled_current {
+  color: #00a7db;
+}
+.Zebra_DatePicker td.dp_disabled {
+  color: #DEDEDE;
+  cursor: default;
+}
+.Zebra_DatePicker td.dp_hover {
+  background: #dedede;
 }
