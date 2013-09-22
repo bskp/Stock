@@ -1,0 +1,67 @@
+/**
+ * HasLayout
+ *
+ * Gives the element has-layout in IE. By switching to inline-block
+ * it will make the element haslayout, then we just switch it back.
+ * Alternatives are: zoom:1; overflow:anything; (IE7+), float, position:absolute;
+ *
+ * @see  http://www.satzansatz.de/cssd/onhavinglayout.html
+ * @type Mixin
+ */
+/**
+ * Quick Clearfix
+ *
+ * Clears an element of its floated children. The quick way.
+ */
+/**
+ * Clearfix
+ *
+ * Clears an element of its floated children.
+ */
+/**
+ * Sharpen an image if it has become blurry due to upscaling or downscaling
+ * Useful mainly in flat color images
+ * @see https://developer.mozilla.org/en/CSS/image-rendering
+ */
+/**
+ * When photos are upscaled or downscaled, they often get blurry. Don't use
+ * this on flat color images, they will still appear blurry.
+ * Use the +sharpen mixin instead.
+ * @see https://developer.mozilla.org/en/CSS/image-rendering
+ */
+/**
+ * Optimizes the rendering on images so they
+ * appear faster, but at a lower quality. Useful for <video>
+ */
+/**
+ * Reset
+ *
+ * Reset an elements margin and padding so it's
+ * easier to style.
+ *
+ * @type Mixin
+ */
+/**
+ * Reset Box
+ *
+ * Resets the entire box model for the element
+ *
+ * @type Mixin
+ */
+/**
+ * Reset all
+ *
+ * A more detailed reset, covering most properties
+ *
+ * @type Mixin
+ */
+/**
+ * Easier way to use border-radius
+ *
+ * @license BSD License
+ */
+/**
+ * Hides an elements off the page, but keeps it visible for accessibility
+ *
+ * @license BSD License
+ */
