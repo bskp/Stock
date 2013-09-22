@@ -17,10 +17,10 @@ class Item(ndb.Model):
     count = ndb.IntegerProperty()
     # The corresponding image is saved saved under img/<entity.id>.jpg
 
-    # Prices order as follows: Jubla-internal, other organisations,
-    # commercial organisations, price to buy (merch only).
-    # If some are omitted, the last given amount is repeated
-    prices = ndb.FloatProperty(repeated=True)
+    price_int = ndb.FloatProperty()
+    price_ext = ndb.FloatProperty()
+    price_com = ndb.FloatProperty()
+    price_buy = ndb.FloatProperty()
 
     tax_per_day = ndb.BooleanProperty() # taxing option for e.g. cars
     category = ndb.StringProperty(choices=CATEGORIES)
@@ -28,11 +28,17 @@ class Item(ndb.Model):
     def __repr__(self):
         return u"<Item %s>" % (self.key.id())
 
-    def in_stock(date):
+    def in_stock(self, date):
         ''' Returns the amount in stock on a given date '''
         lends = Lend.query(Lend.date_end < date, Lend.date_start > date).fetch()
         counts = [l.count for l in lends if key.id() in l.items]
         return count - sum(counts)
+
+    def print_prices(self):
+        prices = [self.price_int, self.price_ext, self.price_com, self.price_buy]
+        prices = map(lambda price: r'<span="price">%s</span>'%price if not price == -1 else '-', prices)
+        return '/'.join(prices)
+        #return reduce(lambda s, price: s + '<span class="price">%s</span>' if price else '-', self.prices)
 
 
 class Lend(ndb.Model):

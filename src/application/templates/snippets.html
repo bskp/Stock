@@ -1,0 +1,16 @@
+{% macro pricelist(item) -%}
+<ul class="pricelist">
+    {% if item.price_int or item.price_ext or item.price_com -%}
+        <span>Miete</span>
+        {% if item.price_int != -1 %}<li title="Jubla-Scharen" alt="int">{{ item.price_int }}</li>{% endif %}
+        {% if item.price_ext != -1 %}<li title="Jugendvereine" alt="ext">{{ item.price_ext }}</li>{% endif %}
+        {% if item.price_com != -1 %}<li title="Sportvereine" alt="com">{{ item.price_com }}</li>{% endif %}
+        {% if item.tax_per_day %}Tag
+        {% else %}Woche{% endif %}
+    {% endif %}
+    {% if item.price_buy != -1 %}
+        <span>Kauf</span>
+        <li title="Kaufpreis" alt="buy">{{ item.price_buy }}</li>
+    {% endif %}
+</ul>
+{%- endmacro %}

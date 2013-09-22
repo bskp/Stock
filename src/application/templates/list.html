@@ -1,3 +1,9 @@
+<aside id="flash">
+    {% for category, message in get_flashed_messages(with_categories=True) %}
+    <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+</aside>
+
 <ul class="items">
     {% for item in items %}
     <li><a href="{{ url_for('item', id=item.key.id()) }}"
@@ -9,5 +15,5 @@
     </a></li>
     {% endfor %}
 
-    <a href="{{ url_for('item_create') }}" data-pjax="#sidebar">Hinzufügen</a>
+    <a href="{{ url_for('item_create') }}" data-pjax="#content">Hinzufügen</a>
 </ul>

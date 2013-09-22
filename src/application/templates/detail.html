@@ -1,2 +1,6 @@
+{%- import "snippets.html" as snippets with context %}
+
+
 <h1>{{item.name}}</h1>
-<p>{{item.description}}</p>
+{{ snippets.pricelist(item) }}
+<p id="description">{{item.description}}</p>

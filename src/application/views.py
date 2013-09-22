@@ -80,24 +80,23 @@ def item_create(replace_key=None):
         name = request.form.get('name'),
         description = request.form.get('description'),
         count = int(request.form.get('count')) if request.form.get('count') else 1,
-        prices = [float(request.form.get('price_int')) if request.form.get('price_int') else 0,
-                  float(request.form.get('price_ext')) if request.form.get('price_ext') else 0,
-                  float(request.form.get('price_com')) if request.form.get('price_com') else 0,
-                  float(request.form.get('price_buy')) if request.form.get('price_buy') else 0,
-                  ],
+
+        price_int = float(request.form.get('price_int')) if request.form.get('price_int') else -1,
+        price_ext = float(request.form.get('price_ext')) if request.form.get('price_ext') else -1,
+        price_com = float(request.form.get('price_com')) if request.form.get('price_com') else -1,
+        price_buy = float(request.form.get('price_buy')) if request.form.get('price_buy') else -1,
+
         tax_per_day = True if request.form.get('tax_per_day') else False,
         category = request.form.get('category'),
         )
     id = item.put().id()
+
     '''
-    file = request.files['file']
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     #TODO
     #return pjax('flash.html', 'success', '"%s" gesichert!'%id)
     '''
-    return 'gesichert.'
+    flash('%s gesichert.'%item.name, 'success')
+    return list()
 
 
 @app.route('/login', methods=['GET', 'POST'])
