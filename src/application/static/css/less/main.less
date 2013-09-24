@@ -141,6 +141,28 @@ input.datepicker{
     }
 }
 
+.pricelist{
+    cursor: default;
+    span{
+        font-weight: bold;
+
+        &::after{ content: ' /'; color: @gray; }
+
+        &:hover::before{
+            content: attr(title);
+            position: relative;
+            width: 0;
+            top: -1em;
+            display: inline-block;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+    }
+
+
+}
+
+
 ul.items{
     padding: 0;
 
