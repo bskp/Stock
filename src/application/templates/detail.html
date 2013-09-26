@@ -1,6 +1,19 @@
-{%- import "snippets.html" as snippets with context %}
+{% extends "list.html" %}
+
+{% block sidebar %}
+    <h1>{{item.name}}</h1>
+    <p id="description">{{item.description}}</p>
+    {{ snippets.pricelist(item) }}
 
 
-<h1>{{item.name}}</h1>
-{{ snippets.pricelist(item) }}
-<p id="description">{{item.description}}</p>
+    {% if item.related %}
+    <h2>Oli empfiehlt dazu:</h2>
+    <ul>
+        {% for item in item.get_related() %}
+        <li><a href="{{ url_for('item', id=item.key.id()) }}" title="{{ item.description }}">
+            {{ item.name }}
+        </a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}

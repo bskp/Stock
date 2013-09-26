@@ -24,7 +24,7 @@
 	<body>
         <header>
             <a href="{{ url_for('home') }}"><h1>RAST-Spielmaterialverleih</h1></a>
-            <input style="float:right;" type="text" placeholder="Suche"/>
+            <input id="search" style="float:right;" type="text" placeholder="Suche"/>
 
             <span class="select"><select name="category">
                 <option value="">Alle Artikel</option>
@@ -60,16 +60,6 @@
             {% endif %}
             --!>
         </header>
-
-        <!--
-        <aside id="flash">
-            {% for category, message in get_flashed_messages(with_categories=True) %}
-            <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        </aside>
-        --!>
-
-        <aside id="sidebar"></aside>
-        <section id="content">{% include template %}</section>
+        <div id="target">{% include template %}</div>
 	</body>
 </html>

@@ -21,9 +21,11 @@ class Item(ndb.Model):
     price_ext = ndb.FloatProperty()
     price_com = ndb.FloatProperty()
     price_buy = ndb.FloatProperty()
-
     tax_per_day = ndb.BooleanProperty() # taxing option for e.g. cars
+
     category = ndb.StringProperty(choices=CATEGORIES)
+    related = ndb.KeyProperty(kind='Item', repeated=True)
+
 
     def __repr__(self):
         return u"<Item %s>" % (self.key.id())
@@ -34,11 +36,9 @@ class Item(ndb.Model):
         counts = [l.count for l in lends if key.id() in l.items]
         return count - sum(counts)
 
-    def print_prices(self):
-        prices = [self.price_int, self.price_ext, self.price_com, self.price_buy]
-        prices = map(lambda price: r'<span="price">%s</span>'%price if not price == -1 else '-', prices)
-        return '/'.join(prices)
-        #return reduce(lambda s, price: s + '<span class="price">%s</span>' if price else '-', self.prices)
+    def get_related(self):
+        #keys = [ndb.Key('Item', id) for id in self.related] 
+        return ndb.get_multi(self.related)
 
 
 class Lend(ndb.Model):

@@ -13,7 +13,7 @@ from werkzeug import secure_filename
 
 from flask_cache import Cache
 
-from application import app, pjax, make_url_safe
+from application import app, make_url_safe
 from decorators import login_required, admin_required
 from models import Item, Lend, ndb, CATEGORIES
 
@@ -21,6 +21,21 @@ from models import Item, Lend, ndb, CATEGORIES
 # Flask-Cache (configured to use App Engine Memcache API)
 cache = Cache(app)
 
+
+def pjax(template, query=None, **kwargs):
+    """Determine whether the request was made by PJAX."""
+
+    if not query:
+        query = Item.query()
+
+    if "X-PJAX" in request.headers:
+        return render_template(template, items=query.fetch(), **kwargs)
+    
+    return render_template('base.html',
+                           template = template,
+                           items = query.fetch(),
+                           **kwargs
+                           )
 
 @app.route('/')
 def home():
@@ -32,10 +47,7 @@ def list(query=None):
     ''' Generic listing function, called by every other pre-filtering
     listers (see below).'''
     
-    if not query:
-        query = Item.query()
-
-    return pjax('list.html', items=query.fetch())
+    return pjax('list.html', query)
 
 
 @app.route('/list/<string:category>')
@@ -89,6 +101,9 @@ def item_create(replace_key=None):
         tax_per_day = True if request.form.get('tax_per_day') else False,
         category = request.form.get('category'),
         )
+    import pdb
+    pdb.set_trace()
+
     id = item.put().id()
 
     '''

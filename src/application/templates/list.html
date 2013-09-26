@@ -1,19 +1,37 @@
+{%- import "snippets.html" as snippets with context %}
+
+<aside id="sidebar">
+{% block sidebar %}
+{% endblock %}
+</aside>
+
 <aside id="flash">
+{% block flash %}
     {% for category, message in get_flashed_messages(with_categories=True) %}
     <div class="flash {{ category }}">{{ message }}</div>
     {% endfor %}
+{% endblock %}
 </aside>
 
-<ul class="items">
-    {% for item in items %}
-    <li><a href="{{ url_for('item', id=item.key.id()) }}"
-        data-pjax="#sidebar"
-        title="{{ item.description }}"
-        style="background-image: url('uploads/{{ item.key.id() }}.jpg');">
+<section id="content">
+{% block content %}
+    <ul class="items">
+        {% for litem in items %}
+        {% if item and item == litem %}
+        <li class="selected">
+        {% else %}
+        <li>
+        {% endif %}
+            <a href="{{ url_for('item', id=litem.key.id()) }}"
+            title="{{ litem.description }}"
+            style="background-image: url('/uploads/{{ litem.key.id() }}.jpg');">
 
-        <span>{{ item.name }}</span>
-    </a></li>
-    {% endfor %}
+            <span>{{ litem.name }}</span>
+            </a>
+        </li>
+        {% endfor %}
 
-    <a href="{{ url_for('item_create') }}" data-pjax="#content">Hinzufügen</a>
-</ul>
+        <a href="{{ url_for('item_create') }}">Hinzufügen</a>
+    </ul>
+{% endblock %}
+</section>

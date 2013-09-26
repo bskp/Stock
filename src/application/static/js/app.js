@@ -1,5 +1,5 @@
 $(function() {
-    targets = $('a[data-pjax]').pjax();
+    $(document).pjax('a', '#target');
 
     $(document).ready(function(){
             config = {
@@ -20,6 +20,27 @@ $(function() {
     $(document).on('click', 'body', function(){
         $('#sidebar').empty();
     }); 
+
+    
+    filter_list = function(query) {
+        fuzzy = function(needle, hay){
+            return hay.toLowerCase().search(needle.toLowerCase()) > 0
+        }
+
+        $('.items li a').each(function(){
+            self = $(this);
+            hit = query == '' || fuzzy(query, self.attr('title')) || fuzzy(query, self.text());
+            if (hit){
+                self.removeClass('hidden');
+            } else {
+                self.addClass('hidden');
+            }
+        });
+    }
+
+    $('#search').bind('change paste keyup', function() {
+        filter_list( $(this).val() ); 
+    });
 
 })
 

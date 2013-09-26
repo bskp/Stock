@@ -1507,6 +1507,9 @@ header select {
 header input::-webkit-input-placeholder {
   color: #000000;
 }
+#target {
+  display: inline;
+}
 #content {
   padding: 0 1em;
 }
@@ -1515,10 +1518,20 @@ header input::-webkit-input-placeholder {
   background-color: #ffffff;
   height: 100%;
   padding: 1em;
+  padding-top: 0.5em;
   border-left: solid 1px rgba(0, 0, 0, 0.1);
 }
 #sidebar h1 {
   width: 423px;
+  margin-top: 0;
+}
+#sidebar h2 {
+  text-transform: uppercase;
+  font-size: 1em;
+  margin-bottom: 0;
+}
+#sidebar #description {
+  font-style: italic;
 }
 body,
 html {
@@ -1586,15 +1599,17 @@ input.datepicker {
 }
 .pricelist span::after {
   content: ' /';
-  color: #777777;
+  font-weight: normal;
 }
 .pricelist span:hover::before {
   content: attr(title);
   position: relative;
   width: 0;
-  top: -1em;
+  top: -1.4em;
   display: inline-block;
-  font-weight: normal;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.8em;
   white-space: nowrap;
 }
 ul.items {
@@ -1629,6 +1644,14 @@ ul.items li a span {
   background-color: #ffffff;
   line-height: 0.9em;
   padding: 0.5em 0;
+}
+ul.items li.selected a {
+  border-bottom-width: 3px !important;
+  position: relative;
+  top: -3px;
+}
+ul.items li a.hidden {
+  opacity: 0.2;
 }
 .Zebra_DatePicker *,
 .Zebra_DatePicker *:after,
