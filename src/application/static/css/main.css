@@ -1530,8 +1530,15 @@ header input::-webkit-input-placeholder {
   font-size: 1em;
   margin-bottom: 0;
 }
+#sidebar h1 + h2 {
+  margin-top: -1em;
+}
 #sidebar #description {
   font-style: italic;
+  width: 423px;
+}
+#sidebar img {
+  max-width: 423px;
 }
 body,
 html {
@@ -1575,6 +1582,20 @@ select {
   word-spacing: inherit;
   background: transparent;
   color: inherit;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  -webkit-appereance: none;
+}
+label {
+  display: block;
+}
+textarea {
+  width: 100%;
+  height: 6em;
 }
 .select select {
   border-radius: 0;
@@ -1585,11 +1606,24 @@ input.datepicker {
   text-align: center;
   cursor: text;
 }
-.btn {
+a i {
   cursor: pointer;
+}
+a i:hover {
+  text-decoration: none;
+  color: #00a7db;
+}
+.btn {
+  margin-top: 1em;
+  cursor: pointer;
+  display: block;
+  width: 11em;
+  text-align: left;
+  border-top: 1px solid black;
 }
 .btn:hover {
   text-decoration: none;
+  background-color: #00a7db;
 }
 .pricelist {
   cursor: default;
@@ -1607,6 +1641,13 @@ input.datepicker {
   width: 0;
   top: -1.4em;
   display: inline-block;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+.in_cart:hover::after {
+  content: 'yeah, shoppen!';
   font-weight: bold;
   text-transform: uppercase;
   font-size: 0.8em;
@@ -1646,9 +1687,11 @@ ul.items li a span {
   padding: 0.5em 0;
 }
 ul.items li.selected a {
-  border-bottom-width: 3px !important;
-  position: relative;
-  top: -3px;
+  -webkit-transform: rotate(8deg);
+  -moz-transform: rotate(8deg);
+  -ms-transform: rotate(8deg);
+  -o-transform: rotate(8deg);
+  transform: rotate(8deg);
 }
 ul.items li a.hidden {
   opacity: 0.2;

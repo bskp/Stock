@@ -47,7 +47,7 @@ def list(query=None):
     ''' Generic listing function, called by every other pre-filtering
     listers (see below).'''
     
-    return pjax('list.html', query)
+    return pjax('content.html', query)
 
 
 @app.route('/list/<string:category>')
@@ -63,28 +63,52 @@ def list_date(start, end):
     raise NotImplemented
 
 
-'''
-@app.route('/item/<id>', methods=[, 'DELETE', 'PATCH'])
-def item_do(id):
-    key = ndb.Key('Item', id) 
-'''
-
-
 @app.route('/item/<id>', methods=['GET'])
 def item(id):
     key = ndb.Key('Item', id) 
     if request.method == 'GET':
-        return pjax('detail.html', item=key.get())
+        return pjax('detail.html',
+                    item=key.get(),
+                    in_cart = session.get(id),
+                   ) 
 
+
+@app.route('/item/<id>/edit')
+def item_edit(id):
+    return item_create(ndb.Key('Item', id))
+
+@app.route('/item/<id>/take')
+@app.route('/item/<id>/take/<int:count>')
+def item_take(id, count=1):
+    if not id in session:
+        session[id] = 0
+    session[id] += count;
+    flash('%s eingepackt.'%id, 'success')
+    return item(id)
+
+@app.route('/item/<id>/put')
+@app.route('/item/<id>/put/<int:count>')
+def item_put(id, count=1):
+    if not id in session:
+        session[id] = 0
+    session[id] -= count;
+    if session[id] < 0:
+        session[id] = 0
+    flash('%s zurueckgelegt.'%id, 'success')
+    return item(id)
 
 @app.route('/item_create', methods=['GET', 'POST'])
 def item_create(replace_key=None):
-    if request.method == 'GET':
-        return pjax('create_item.html', item=None)
-    # Else POST: save to db
     if replace_key:
         item = replace_key.get()
     else:
+        item = None
+
+    if request.method == 'GET':
+        return pjax('create_item.html', item=item)
+
+    # Else POST: save to db
+    if not item:
         url_safe_name = make_url_safe(request.form.get('name'))
         item = Item(id = url_safe_name)
         
@@ -98,17 +122,23 @@ def item_create(replace_key=None):
         price_com = float(request.form.get('price_com')) if request.form.get('price_com') else -1,
         price_buy = float(request.form.get('price_buy')) if request.form.get('price_buy') else -1,
 
-        tax_per_day = True if request.form.get('tax_per_day') else False,
+        tax_per_day = True if request.form.get('tax_per_day')==1 else False,
         category = request.form.get('category'),
         )
+    id = item.put().id()
+    '''
     import pdb
     pdb.set_trace()
+    file = request.files['image']
+    if file:
+        import os
+        filename = secure_filename(id)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'originals', filename))
+        import Image as i
+        image = i.open(file)
+        image.thumbnail((140,140),True)
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), "jpg")
 
-    id = item.put().id()
-
-    '''
-    #TODO
-    #return pjax('flash.html', 'success', '"%s" gesichert!'%id)
     '''
     flash('%s gesichert.'%item.name, 'success')
     return list()
@@ -132,7 +162,6 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    flash('Du bist jetzt abgemeldet.')
     return redirect(url_for('show_things'))
 
 

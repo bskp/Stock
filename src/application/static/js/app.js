@@ -17,9 +17,11 @@ $(function() {
     }) // document.ready
     
     // Provide "deselecting"/
+    /*
     $(document).on('click', 'body', function(){
         $('#sidebar').empty();
     }); 
+    */
 
     
     filter_list = function(query) {
@@ -38,9 +40,30 @@ $(function() {
         });
     }
 
-    $('#search').bind('change paste keyup', function() {
-        filter_list( $(this).val() ); 
+    $('#search').bind('change paste keyup', function(e) {
+        var search = $(this)
+        if (e.keyCode == 27) { // Escape
+            search.val('');
+            search.blur();
+            filter_list( $(this).val() );
+        }
+        else if (e.keyCode == 13) { // Enter
+            search.blur();
+        } else {
+            filter_list( $(this).val() );
+        }
     });
+    
+    $('#list_category').bind('change', function(e) {
+        if ($(this).val()){
+            url = '/list/'+$(this).val();
+        } else {
+            url = '/list';
+        }
+        $.pjax({url: url, container:'#target'});
+    });
+
+
 
 })
 

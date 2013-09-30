@@ -1,22 +1,38 @@
-{% extends "list.html" %}
+{% extends "content.html" %}
 
-{% block content %}
-    <form action="{{ url_for('item_create') }}" method="post">
+{% block sidebar %}
+    <form action="{{ url_for('item_create') }}" method="post" enctype="multipart/form-data">
     <h1><input name="name" value="{{item.name}}" placeholder="Name" /></h1>
-    <div id="info">
-        <input name="count" value="{{item.count}}" placeholder="Anzahl" />×
-        Fr. <input name="price_int" value="{{item.price_int}}" placeholder="intern" />
-        Fr. <input name="price_ext" value="{{item.price_ext}}" placeholder="extern" />
-        Fr. <input name="price_com" value="{{item.price_com}}" placeholder="kommerziell" />
-        Fr. <input name="price_buy" value="{{item.price_buy}}" placeholder="Kaufpreis" />
-        Preis pro <select name="precise_tax">
-            <option value="0">Woche</option>
-            <option value="1">Tag</option>
-        </select>
-    </div>
+    <h2>
+    <span class="select"><select name="category">
+        <option value="">(Keine Kategorie)</option>
+        <option value="outdoor">Spielmaterial draussen</option>
+        <option value="indoor">Spielmaterial drinnen</option>
+        <option value="vehicle">Vehikel</option>
+        <option value="merchandise">Fan-Artikel</option>
+        <option value="machines">Maschinen</option>
+    </select>
+    </span>
+    </h2>
 
     <p id="description"><textarea name="description" placeholder="Beschreibung">{{item.description}}</textarea></p>
 
-    <input type="submit" name="ok" value="OK" />
+    <input name="count" value="{{item.count}}" placeholder="Anzahl" />×
+
+    <h2>Miete</h2>
+    <label>Fr. <input name="price_int" value="{{item.price_int}}" placeholder="intern" /></label>
+    <label>Fr. <input name="price_ext" value="{{item.price_ext}}" placeholder="extern" /></label>
+    <label>Fr. <input name="price_com" value="{{item.price_com}}" placeholder="kommerziell" /></label>
+    <label>Preis pro <select name="precise_tax">
+        <option value="0">Woche</option>
+        <option value="1">Tag</option>
+    </select></label>
+
+    <h2>Kauf</h2>
+    <label>Fr. <input name="price_buy" value="{{item.price_buy}}" placeholder="Kaufpreis" /></label>
+
+    <input name="image" type="file" accept="image/*" placeholder="Bild auswählen"/>
+
+    <input type="submit" class="btn" name="ok" value="OK" />
     </form>
 {% endblock %}

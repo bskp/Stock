@@ -25,8 +25,9 @@
         <header>
             <a href="{{ url_for('home') }}"><h1>RAST-Spielmaterialverleih</h1></a>
             <input id="search" style="float:right;" type="text" placeholder="Suche"/>
+            <a id="cart" style="float:right;"><i class="icon-shopping-cart"></i></a>
 
-            <span class="select"><select name="category">
+            <span class="select"><select name="category" id="list_category">
                 <option value="">Alle Artikel</option>
                 <option value="outdoor">Spielmaterial draussen</option>
                 <option value="indoor">Spielmaterial drinnen</option>
@@ -39,7 +40,7 @@
             bis
             <input type="text" class="datepicker" name="until" id="until">
 
-            <a class="btn" id="reset"><i class="icon-remove-sign"></i></a>
+            <a id="reset"><i class="icon-remove-sign"></i></a>
 
             <!--
             Tarife für

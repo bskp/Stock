@@ -8,7 +8,7 @@ App Engine datastore models
 from google.appengine.ext import ndb
 
 # Categories for items
-CATEGORIES = ['outdoor','indoor','vehicle','merchandise', 'machines']
+CATEGORIES = ['', 'outdoor','indoor','vehicle','merchandise', 'machines']
 
 class Item(ndb.Model):
     '''An item that can be bought or borrowed'''

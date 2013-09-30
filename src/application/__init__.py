@@ -26,6 +26,7 @@ def jinja_cash(amount):
 app.jinja_env.filters['cash'] = jinja_cash
 
 
+
 '''
 @app.context_processor
 def inject_profiler():

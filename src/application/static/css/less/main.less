@@ -76,7 +76,18 @@ header{
         margin-bottom: 0;
     }
 
-    #description{ font-style: italic; }
+    h1 + h2{
+        margin-top: -1em;
+    }
+
+    #description{
+        font-style: italic;
+        width: 423px;
+    }
+
+    img{
+        max-width: 423px;
+    }
 }
 
 body,html{ height: 100%; }
@@ -128,7 +139,19 @@ textarea, input, select{
     word-spacing: inherit;
     background: transparent;
     color: inherit;
+    .border-radius(0px);
+    -webkit-appereance:none;
     //.placeholder(@black);
+}
+
+label{
+    // labels to structure formulars
+    display: block;
+}
+
+textarea{
+    width: 100%;
+    height: 6em;
 }
 
 // Select-wrapper to get rid of glitter
@@ -148,11 +171,27 @@ input.datepicker{
     cursor: text;
 }
 
-.btn{
+// Icon-buttons
+a i{
     cursor: pointer;
 
     &:hover{
         text-decoration: none;
+        color: @accent;
+    }
+}
+
+.btn{
+    margin-top: 1em;
+    cursor: pointer;
+    display: block;
+    width: 11em;
+    text-align: left;
+    border-top: 1px solid black;
+
+    &:hover{
+        text-decoration: none;
+        background-color: @accent;
     }
 }
 
@@ -181,6 +220,15 @@ input.datepicker{
 
 }
 
+.in_cart{
+    &:hover::after{
+        content: 'yeah, shoppen!';
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.8em;
+        white-space: nowrap;
+    }
+}
 
 ul.items{
     padding: 0;
@@ -219,9 +267,7 @@ ul.items{
         } // a
 
         &.selected a{
-            border-bottom-width: 3px !important;
-            position: relative;
-            top: -3px;
+            .transform(rotate(8deg));
         }
 
         a.hidden{
