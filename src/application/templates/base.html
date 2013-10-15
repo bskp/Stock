@@ -24,6 +24,7 @@
 	<body>
         <header>
             <a href="{{ url_for('home') }}"><h1>RAST-Spielmaterialverleih</h1></a>
+            <a class="reset" data-target="#search" style="float:right;"><i class="icon-remove-sign"></i></a>
             <input id="search" style="float:right;" type="text" placeholder="Suche"/>
             <a id="cart" style="float:right;"><i class="icon-shopping-cart"></i>Wägeli</a>
 
@@ -40,7 +41,7 @@
             bis
             <input type="text" class="datepicker" name="until" id="until">
 
-            <a id="reset"><i class="icon-remove-sign"></i></a>
+            <a class="reset" data-target=".datepicker"><i class="icon-remove-sign"></i></a>
 
             <!--
             Tarife für
