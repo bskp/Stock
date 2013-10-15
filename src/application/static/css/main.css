@@ -1609,9 +1609,12 @@ input.datepicker {
 a i {
   cursor: pointer;
 }
-a i:hover {
+a:hover i {
   text-decoration: none;
   color: #00a7db;
+}
+header a:hover i {
+  color: #ffffff;
 }
 .btn {
   margin-top: 1em;
