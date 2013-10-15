@@ -1647,7 +1647,7 @@ a i:hover {
   white-space: nowrap;
 }
 .in_cart:hover::after {
-  content: 'yeah, shoppen!';
+  content: attr(title);
   font-weight: bold;
   text-transform: uppercase;
   font-size: 0.8em;

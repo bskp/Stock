@@ -58,9 +58,11 @@ def list_cat(category):
     return list(query)
 
 
-@app.route('/list/between/<int:start>/and/<int:end>')
-def list_date(start, end):
-    raise NotImplemented
+@app.route('/lend/between/<int:start>/and/<int:end>')
+def set_timespan(start, end):
+    session['from'] = start
+    session['until'] = end
+    return redirect(url_for('list'))
 
 
 @app.route('/item/<id>', methods=['GET'])

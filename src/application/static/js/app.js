@@ -9,7 +9,17 @@ $(function() {
                         show_clear_date: false,
                         show_icon: false,
                         direction: true,
-                        format: 'j. M Y'
+                        format: 'j. M Y',
+                        
+                        onSelect: function(){
+                            var from = $('#from').val();
+                            var until = $('#until').val();
+
+                            if (from && until){
+                                var url = '/lend/between/'+from+'/and/'+until; 
+                                $.pjax({url: url, container:'#target'});
+                            }
+                        }
                      };
         
             $('#from.datepicker').Zebra_DatePicker(config);
@@ -64,6 +74,11 @@ $(function() {
     });
 
 
+    $('.reset').bind('click', function(e) {
+        var t = $(this).data('target');
+        $(t).val('');
+        $(t).trigger('change');
+    });
 
 })
 

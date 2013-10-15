@@ -1,5 +1,10 @@
 {% extends "content.html" %}
 
+{% set ad=['yeah, shoppen!', 'eins davon kann nicht schaden...',
+'los, einpacken!', 'tönt praktisch', 'wollt ich schon immer mal...',
+'am liebsten schon heute geliefert', 'first come, first serve!'] %}
+
+
 {% block sidebar %}
     <a href="{{ url_for('item_edit', id=item.key.id()) }}" style="float: right;"><i class="icon-edit icon-2x"></i></a>
 
@@ -11,7 +16,7 @@
     <p id="description">{{item.description}}</p>
     {{ snippets.pricelist(item) }}
         
-    <div class="in_cart">
+    <div class="in_cart" title="{{ ad|random }}">
         {% if in_cart %}{{ in_cart }}×{% endif %}<i class="icon-shopping-cart 2x"></i>
         <a href="{{ url_for('item_take', id=item.key.id()) }}"><i class="icon-plus-sign-alt"></i></a>
         {% if in_cart>0 %}
