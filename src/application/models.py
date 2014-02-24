@@ -1,60 +1,58 @@
 """
 models.py
-App Engine datastore models
+Sqlite datastore models
 
 """
 
-
-from google.appengine.ext import ndb
+from application import db
 
 # Categories for items
 CATEGORIES = ['', 'outdoor','indoor','vehicle','merchandise', 'machines']
 
-class Item(ndb.Model):
+class Item(db.Model):
     '''An item that can be bought or borrowed'''
-    name = ndb.StringProperty()
-    description = ndb.TextProperty()
-    count = ndb.IntegerProperty()
-    # The corresponding image is saved saved under img/<entity.id>.jpg
+    id = db.Column(db.String(), primary_key=True)
+    name = db.Column(db.Unicode(), unique=True)
+    description = db.Column(db.UnicodeText)
+    count = db.Column(db.Integer, default=1)
+    # The corresponding image is saved saved under uploads/<entity.id>.jpg
 
-    price_int = ndb.FloatProperty()
-    price_ext = ndb.FloatProperty()
-    price_com = ndb.FloatProperty()
-    price_buy = ndb.FloatProperty()
-    tax_per_day = ndb.BooleanProperty() # taxing option for e.g. cars
+    price_int = db.Column(db.Float)
+    price_ext = db.Column(db.Float)
+    price_com = db.Column(db.Float)
+    price_buy = db.Column(db.Float)
+    tax_per_day = db.Column(db.Boolean(), default=False) # taxing option for e.g. cars
 
-    category = ndb.StringProperty(choices=CATEGORIES)
-    related = ndb.KeyProperty(kind='Item', repeated=True)
+    category = db.Column(db.Enum(*CATEGORIES))
+    #related = relationship('Item', order_by='Item.id')
 
 
     def __repr__(self):
-        return u"<Item %s>" % (self.key.id())
+        return u"<Item %s>" % (self.id)
 
+    '''
     def in_stock(self, date):
-        ''' Returns the amount in stock on a given date '''
+        #Returns the amount in stock on a given date
         lends = Lend.query(Lend.date_end < date, Lend.date_start > date).fetch()
-        counts = [l.count for l in lends if key.id() in l.items]
+        counts = [l.count for l in lends if id in l.items]
         return count - sum(counts)
+    '''
 
-    def get_related(self):
-        #keys = [ndb.Key('Item', id) for id in self.related] 
-        return ndb.get_multi(self.related)
+class Lend(db.Model):
+    ''' Whenever an item is borrowed or bought, a lend entity is created '''
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Unicode())
+    email = db.Column(db.Unicode())
+    tel = db.Column(db.Unicode())
+    group = db.Column(db.Unicode())
+    payment = db.Column(db.Unicode())
+    delivery = db.Column(db.Unicode()) # Address
+    remarks = db.Column(db.UnicodeText())
 
+    #items = ndb.KeyProperty(kind='Item', repeated=True)
+    #item_amounts = ndb.IntegerProperty(repeated=True)
 
-class Lend(ndb.Model):
-    '''Whenever an item is borrowed or bought, a lend entity is created'''
-    name = ndb.StringProperty()
-    email = ndb.StringProperty()
-    tel = ndb.StringProperty()
-    group = ndb.StringProperty(choices=['new', 'confirmed', 'back'])
-    payment = ndb.StringProperty(choices=['cash', 'invoice'])
-    delivery = ndb.StringProperty() # Address
-    remarks = ndb.TextProperty()
-
-    items = ndb.KeyProperty(kind='Item', repeated=True)
-    item_amounts = ndb.IntegerProperty(repeated=True)
-
-    date_start = ndb.DateProperty()
-    date_end = ndb.DateProperty()
-    date = ndb.DateProperty(auto_now_add=True)
+    date_start = db.Column(db.Date)
+    date_end = db.Column(db.Date)
+    date = db.Column(db.DateTime)
 

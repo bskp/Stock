@@ -22,9 +22,9 @@
         {% else %}
         <li>
         {% endif %}
-            <a href="{{ url_for('item', id=litem.key.id()) }}"
+            <a href="{{ url_for('item', id=litem.id) }}"
             title="{{ litem.description }}"
-            style="background-image: url('/uploads/{{ litem.key.id() }}.jpg');">
+            style="background-image: url('/uploads/{{ litem.id }}.jpg');">
 
             <span>{{ litem.name }}</span>
             </a>

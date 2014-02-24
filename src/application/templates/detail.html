@@ -6,21 +6,21 @@
 
 
 {% block sidebar %}
-    <a href="{{ url_for('item_edit', id=item.key.id()) }}" style="float: right;"><i class="icon-edit icon-2x"></i></a>
+    <a href="{{ url_for('item_edit', id=item.id) }}" style="float: right;"><i class="icon-edit icon-2x"></i></a>
 
     <h1>{{item.name}}</h1>
     <h2>{{item.category}}</h2>
 
-    <img src="/uploads/{{ item.key.id() }}.jpg" />
+    <img src="/uploads/{{ item.id }}.jpg" />
 
     <p id="description">{{item.description}}</p>
     {{ snippets.pricelist(item) }}
         
     <div class="in_cart" title="{{ ad|random }}">
         {% if in_cart %}{{ in_cart }}×{% endif %}<i class="icon-shopping-cart 2x"></i>
-        <a href="{{ url_for('item_take', id=item.key.id()) }}"><i class="icon-plus-sign-alt"></i></a>
+        <a href="{{ url_for('item_take', id=item.id) }}"><i class="icon-plus-sign-alt"></i></a>
         {% if in_cart>0 %}
-        <a href="{{ url_for('item_put', id=item.key.id()) }}"><i class="icon-minus-sign-alt"></i></a>
+        <a href="{{ url_for('item_put', id=item.id) }}"><i class="icon-minus-sign-alt"></i></a>
         {% endif %}
     </div>
 
@@ -29,7 +29,7 @@
     <h2>Oli empfiehlt dazu:</h2>
     <ul>
         {% for item in item.get_related() %}
-        <li><a href="{{ url_for('item', id=item.key.id()) }}" title="{{ item.description }}">
+        <li><a href="{{ url_for('item', id=item.id) }}" title="{{ item.description }}">
             {{ item.name }}
         </a></li>
         {% endfor %}

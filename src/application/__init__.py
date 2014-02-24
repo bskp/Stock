@@ -3,20 +3,23 @@ Initialize Flask app
 
 """
 from flask import Flask 
+from flask.ext.sqlalchemy import SQLAlchemy
 
-from flask_debugtoolbar import DebugToolbarExtension
-#from gae_mini_profiler import profiler, templatetags
-from werkzeug.debug import DebuggedApplication
+# from flask_debugtoolbar import DebugToolbarExtension
+# from werkzeug.debug import DebuggedApplication
 
 
 app = Flask('application')
 app.config.from_object('application.settings')
+db = SQLAlchemy(app)
 
 # Enable jinja2 loop controls extension
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
 # jinja custom filter for pretty cash-amounts
 def jinja_cash(amount):
+    if not amount:
+        return '-.-'
     big, small = str(amount).split('.')
     if small == '0':
         small = '-'
@@ -38,7 +41,7 @@ def inject_profiler():
 def make_url_safe(string):
     from unidecode import unidecode
     from werkzeug.urls import url_fix
-    return url_fix( unidecode( string.replace(' ', '_') ) )
+    return url_fix( unidecode( string.replace(' ', '_') ) ).lower()
 
 
 # Pull in URL dispatch routes and their views
