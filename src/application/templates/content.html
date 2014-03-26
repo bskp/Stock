@@ -31,7 +31,16 @@
         </li>
         {% endfor %}
 
-        <a href="{{ url_for('item_create') }}"><i class="icon-plus-sign icon-2x"></i></a>
+        <li style="opacity: 0.5;"
+        {% if item is sameas none %}
+            class="selected"
+        {% endif -%}
+            >
+        <a href="{{ url_for('item_create') }}"
+            style="background-image: url('{{url_for('static', filename='img/create_bg.svg')}}');">
+            <span>Neu</span>
+            </a>
+        </li>
     </ul>
 {% endblock %}
 </section>

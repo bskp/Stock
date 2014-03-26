@@ -19,14 +19,17 @@ def pjax(template, query=None, **kwargs):
     """Determine whether the request was made by PJAX."""
 
     if not query:
-        query = Item.query.all()
+        items = Item.query.all()
+    else:
+        items = query
 
     if "X-PJAX" in request.headers:
-        return render_template(template, items=query.fetch(), **kwargs)
+        return render_template(template, items=items, **kwargs)
     
+
     return render_template('base.html',
                            template = template,
-                           items = query,
+                           items=items,
                            **kwargs
                            )
 
@@ -90,6 +93,13 @@ def item(id):
 def item_edit(id):
     return item_create(id)
 
+@app.route('/item/<id>/destroy', methods=['GET', 'POST'])
+def item_destroy(id):
+    item = Item.query.get_or_404(replace)
+
+    flash(u'%s gelöscht.'%id, 'success')
+    return redirect(url_for('list'))
+
 @app.route('/item_create', methods=['GET', 'POST'])
 def item_create(replace=None):
     if replace:
@@ -102,10 +112,9 @@ def item_create(replace=None):
         return pjax('create_item.html', item=item)
     # else POST: save to db
     if not item:
-        url_safe_name = make_url_safe(request.form.get('name'))
-        item = Item(id=url_safe_name)
+        replace = make_url_safe(request.form.get('name'))
+        item = Item(id=replace)
         db.session.add(item)
-        1/0
         
     item.name = request.form.get('name')
     item.description = request.form.get('description')
@@ -120,20 +129,37 @@ def item_create(replace=None):
     item.category = request.form.get('category')
 
     db.session.commit()
-    '''
-    import pdb
-    pdb.set_trace()
+
     file = request.files['image']
     if file:
         import os
-        filename = secure_filename(id)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'originals', filename))
-        import Image as i
-        image = i.open(file)
-        image.thumbnail((140,140),True)
-        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), "jpg")
+        from PIL import Image as i
+        filename = secure_filename(replace) + '.jpg'
 
-    '''
+        image = i.open(file)
+        if image.mode != "RGB":
+            image = image.convert("RGB")
+
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], 'full', filename), "jpeg")
+
+        w  = image.size[0]
+        h = image.size[1]
+
+        aspect = w / float(h)
+        ideal_aspect = 1.0
+
+        if aspect > ideal_aspect:  # Then crop the left and right edges:
+            w_ = int(ideal_aspect * h)
+            offset = (w - w_)/2
+            resize = (offset, 0, w - offset, h)
+        else:  # ... crop the top and bottom:
+            h_ = int(w/ideal_aspect)
+            offset = (h - h_)/2
+            resize = (0, offset, w, h - offset)
+
+        image = image.crop(resize).resize((140, 140), i.ANTIALIAS)
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), "jpeg")
+
     flash('%s gesichert.'%item.name, 'success')
     return list()
 
@@ -159,19 +185,9 @@ def logout():
     return redirect(url_for('show_things'))
 
 
-
-
-def warmup():
-    """App Engine warmup handler
-    See http://code.google.com/appengine/docs/python/config/appconfig.html#Warming_Requests
-
-    """
-    return ''
-
-
-# App Engine warm up handler
-# See http://code.google.com/appengine/docs/python/config/appconfig.html#Warming_Requests
-app.add_url_rule('/_ah/warmup', 'warmup', view_func=warmup)
+@app.route('/uploads/<path:filename>')
+def send_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 '''
 ## Error handlers

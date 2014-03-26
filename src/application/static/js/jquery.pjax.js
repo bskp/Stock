@@ -791,7 +791,7 @@ function enable() {
     replace: false,
     type: 'GET',
     dataType: 'html',
-    scrollTo: 0,
+    scrollTo: false,  // was true
     maxCacheLength: 20,
     version: findVersion
   }

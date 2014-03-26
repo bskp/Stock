@@ -17,19 +17,19 @@
 
     <p id="description"><textarea name="description" placeholder="Beschreibung">{{item.description}}</textarea></p>
 
-    <input name="count" value="{{item.count}}" placeholder="Anzahl" />×
+    <label>Exemplare: <input name="count" value="{{item.count}}" placeholder="Anzahl" style="width: 2em;"/>× </label>
 
     <h2>Miete</h2>
-    <label>Fr. <input name="price_int" value="{{item.price_int}}" placeholder="intern" /></label>
-    <label>Fr. <input name="price_ext" value="{{item.price_ext}}" placeholder="extern" /></label>
-    <label>Fr. <input name="price_com" value="{{item.price_com}}" placeholder="kommerziell" /></label>
+    <label>Fr. <input name="price_int" value="{{item.price_int}}" placeholder="nicht vermietbar an" />Jubla-Scharen</label>
+    <label>Fr. <input name="price_ext" value="{{item.price_ext}}" placeholder="nicht vermietbar an" />Jugendvereine</label>
+    <label>Fr. <input name="price_com" value="{{item.price_com}}" placeholder="nicht vermietbar an" />Sportvereine</label>
     <label>Preis pro <select name="precise_tax">
         <option value="0">Woche</option>
         <option value="1">Tag</option>
     </select></label>
 
     <h2>Kauf</h2>
-    <label>Fr. <input name="price_buy" value="{{item.price_buy}}" placeholder="Kaufpreis" /></label>
+    <label>Fr. <input name="price_buy" value="{{item.price_buy}}" placeholder="unverkäuflich" /></label>
 
     <input name="image" type="file" accept="image/*" placeholder="Bild auswählen"/>
 

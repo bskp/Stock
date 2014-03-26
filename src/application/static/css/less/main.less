@@ -141,8 +141,13 @@ textarea, input, select{
     color: inherit;
     .border-radius(0px);
     -webkit-appereance:none;
-    //.placeholder(@black);
+
+    #sidebar &{
+        background-color: @gray_light;
+        .placeholder(@gray);
+    }
 }
+
 
 label{
     // labels to structure formulars
@@ -257,6 +262,24 @@ ul.items{
 
             // Hide unrounded corners of the span
             overflow: hidden;
+            
+            i { // cart amount indicator
+                font-style: normal;
+                font-size: 16px;
+                position: relative;
+                display: inline-block;
+                left: 53px;
+                top: 13px;
+                height: 1.5em;
+                width: 1.5em;
+
+                color: white;
+                background-color: @accent;
+                border: solid 2px @white;
+
+                .border-radius(99px);
+                //.transform(rotate(14deg));
+            }
 
             span {
                 width: 100%;
