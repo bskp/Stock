@@ -16,7 +16,7 @@ $(function() {
                             var until = $('#until').val();
 
                             if (from && until){
-                                var url = '/lend/between/'+from+'/and/'+until; 
+                                var url = '/available/between/'+from+'/and/'+until; 
                                 $.pjax({url: url, container:'#target'});
                             }
                         }
@@ -80,6 +80,12 @@ $(function() {
         $(t).trigger('change');
     });
 
+
+    $('datepicker .reset').unbind('click').bind('click', function(e) {
+        $('.datepicker').val('');
+        // Clear session values "from" and "until" as well
+        $.pjax({url: '/ignore_availability', container:'#target'});
+    });
 })
 
 /*

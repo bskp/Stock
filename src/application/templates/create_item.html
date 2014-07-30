@@ -35,4 +35,5 @@
 
     <input type="submit" class="btn" name="ok" value="OK" />
     </form>
+    <a href="{{ url_for('item_destroy', id=item.id) }}" class="btn">Zerstören!</a>
 {% endblock %}

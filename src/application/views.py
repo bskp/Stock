@@ -14,9 +14,10 @@ from werkzeug import secure_filename
 from application import app, make_url_safe, db
 from models import Item, Lend, CATEGORIES
 
+from functools import wraps
 
 def pjax(template, query=None, **kwargs):
-    """Determine whether the request was made by PJAX."""
+    '''Determine whether the request was made by PJAX.'''
 
     if not query:
         items = Item.query.all()
@@ -30,8 +31,24 @@ def pjax(template, query=None, **kwargs):
     return render_template('base.html',
                            template = template,
                            items=items,
+                           date_from=session['from'],
+                           date_until=session['until'],
                            **kwargs
                            )
+
+def login_required(f):
+    ''' Wrapper for protected views. '''
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        '''
+        if not 'logged_in' in session:
+            return redirect(url_for('login', next=request.url))
+        '''
+        flash(u'Geschützte Aktion', 'error')
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 
 @app.route('/')
 def home():
@@ -49,13 +66,15 @@ def list(query=None):
 @app.route('/list/<string:category>')
 def list_cat(category):
     if not category in CATEGORIES:
-        return pjax('flash.html', 'error', 'Invalid category')
+        flash(u'Kategorie ungültig!', 'error')
     query = Item.query.filter_by(category=category)
     return list(query)
 
 
-@app.route('/lend/between/<int:start>/and/<int:end>')
-def set_timespan(start, end):
+@app.route('/ignore_availability')
+@app.route('/available/between/<string:start>/and/<string:end>')
+def set_timespan(start=None, end=None):
+    print "set time! from %s to %s" % (start, end)
     session['from'] = start
     session['until'] = end
     return redirect(url_for('list'))
@@ -94,13 +113,20 @@ def item_edit(id):
     return item_create(id)
 
 @app.route('/item/<id>/destroy', methods=['GET', 'POST'])
+@login_required
 def item_destroy(id):
-    item = Item.query.get_or_404(replace)
+    item = Item.query.get_or_404(id)
+
+    # TODO: check dependencies
+
+    db.session.delete(item)
+    db.session.commit()
 
     flash(u'%s gelöscht.'%id, 'success')
     return redirect(url_for('list'))
 
 @app.route('/item_create', methods=['GET', 'POST'])
+@login_required
 def item_create(replace=None):
     if replace:
         item = Item.query.get_or_404(replace)
@@ -165,8 +191,8 @@ def item_create(replace=None):
 
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
+@app.route('/login/<path:next>', methods=['GET', 'POST'])
+def login(next=''):
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
             flash(u'Ungültiger Name!', 'error')
@@ -175,23 +201,24 @@ def login():
         else:
             session['logged_in'] = True
             flash('Du bist jetzt angemeldet.')
-            return redirect(url_for('show_things'))
-    return render_template('login.html')
+            return redirect(next)
+    return pjax('login.html', next=next)
 
 
 @app.route('/logout')
+@login_required
 def logout():
     session.pop('logged_in', None)
-    return redirect(url_for('show_things'))
+    return redirect(url_for('list'))
 
 
 @app.route('/uploads/<path:filename>')
 def send_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-'''
 ## Error handlers
 # Handle 404 errors
+'''
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404

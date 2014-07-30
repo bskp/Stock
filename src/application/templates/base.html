@@ -26,7 +26,6 @@
             <a href="{{ url_for('home') }}"><h1>RAST-Spielmaterialverleih</h1></a>
             <a class="reset" data-target="#search" style="float:right;"><i class="icon-remove-sign"></i></a>
             <input id="search" style="float:right;" type="text" placeholder="Suche"/>
-            <a id="cart" style="float:right;"><i class="icon-shopping-cart"></i>Wägeli</a>
 
             <span class="select"><select name="category" id="list_category">
                 <option value="">Alle Artikel</option>
@@ -37,9 +36,9 @@
                 <option value="machines">Maschinen</option>
             </select></span>
             verfügbar vom
-            <input type="text" class="datepicker" name="from" id="from">
+            <input type="text" class="datepicker" value="{{ date_from }}" name="from" id="from">
             bis
-            <input type="text" class="datepicker" name="until" id="until">
+            <input type="text" class="datepicker" value="{{ date_until }}" name="until" id="until">
 
             <a class="reset" data-target=".datepicker"><i class="icon-remove-sign"></i></a>
 

@@ -6,5 +6,6 @@ jinja2
 simplejson
 Flask
 SQLAlchemy
+Flask-SQLAlchemy
 unidecode
 

@@ -1540,6 +1540,12 @@ header input::-webkit-input-placeholder {
 #sidebar img {
   max-width: 423px;
 }
+#flash {
+  position: absolute;
+  bottom: 0;
+  margin: 0.2em 1em;
+  font-style: italic;
+}
 body,
 html {
   height: 100%;
