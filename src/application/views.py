@@ -6,8 +6,6 @@ Route handlers for HTML
 
 """
 
-#from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
-
 from flask import request, render_template, flash, url_for, redirect, send_from_directory, session
 from werkzeug import secure_filename
 
@@ -15,6 +13,10 @@ from application import app, make_url_safe, db
 from models import Item, Lend, CATEGORIES
 
 from functools import wraps
+
+import locale
+locale.setlocale(locale.LC_ALL, 'de_CH')
+import time
 
 def pjax(template, query=None, **kwargs):
     '''Determine whether the request was made by PJAX.'''
@@ -73,11 +75,24 @@ def list_cat(category):
 
 @app.route('/ignore_availability')
 @app.route('/available/between/<string:start>/and/<string:end>')
-def set_timespan(start=None, end=None):
+def set_timespan(start='', end=''):
     print "set time! from %s to %s" % (start, end)
     session['from'] = start
     session['until'] = end
+
+    # Provide parsing to epoch-ts
+    if start and end:
+        def parse_date(str):
+            t = time.strptime(str, '%d._%b_%Y')
+            return time.mktime(t)
+        session['from_ts'] = parse_date(start)
+        session['until_ts'] = parse_date(end)
+    else:
+        session['from_ts'] = None
+        session['until_ts'] = None
+
     return redirect(url_for('list'))
+
 
 @app.route('/item/<id>/take')
 @app.route('/item/<id>/take/<int:count>')

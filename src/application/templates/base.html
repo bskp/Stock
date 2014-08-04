@@ -36,11 +36,11 @@
                 <option value="machines">Maschinen</option>
             </select></span>
             verfügbar vom
-            <input type="text" class="datepicker" value="{{ date_from }}" name="from" id="from">
+            <input type="text" class="datepicker" value="{{ date_from|replace('_', ' ') }}" name="from" id="from">
             bis
-            <input type="text" class="datepicker" value="{{ date_until }}" name="until" id="until">
+            <input type="text" class="datepicker" value="{{ date_until|replace('_', ' ') }}" name="until" id="until">
 
-            <a class="reset" data-target=".datepicker"><i class="icon-remove-sign"></i></a>
+            <a class="reset" data-target=".datepicker" data-url="/ignore_availability"><i class="icon-remove-sign"></i></a>
 
             <!--
             Tarife für

@@ -2,36 +2,51 @@ $(function() {
     $(document).pjax('a', '#target');
 
     $(document).ready(function(){
-            config = {
-                        days: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
-                        months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-                        show_select_today: false,
-                        show_clear_date: false,
-                        show_icon: false,
-                        direction: true,
-                        format: 'j. M Y',
-                        
-                        onSelect: function(){
-                            var from = $('#from').val();
-                            var until = $('#until').val();
+        // Configure date picker for selection
+        config = {
+            days: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+            months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+            show_select_today: false,
+            show_clear_date: false,
+            show_icon: false,
+            direction: true,
+            default_position: 'below',
+            format: 'j. M Y',
+            
+            onSelect: function(){
+                var from = $('#from').val();
+                var until = $('#until').val();
 
-                            if (from && until){
-                                var url = '/available/between/'+from+'/and/'+until; 
-                                $.pjax({url: url, container:'#target'});
-                            }
-                        }
-                     };
+                from = from.replace(/ /g, '_');
+                until = until.replace(/ /g, '_');
+
+                if (from && until){
+                    var url = '/available/between/'+from+'/and/'+until; 
+                    $.pjax({url: url, container:'#target'});
+                }
+            }
+        };
         
-            $('#from.datepicker').Zebra_DatePicker(config);
-            $('#until.datepicker').Zebra_DatePicker(config);
+        $('#from.datepicker').Zebra_DatePicker(config);
+        $('#until.datepicker').Zebra_DatePicker(config);
+
+        
+        // Configure date picker for availability
+        config.always_visible = $('#calendar_');
+        config.onSelect = null;
+        config.disabled_dates = ['* * * 3,6'];
+
+        $('#calendar.datepicker').Zebra_DatePicker(config);
+        
+
     }) // document.ready
     
     // Provide "deselecting"/
-    /*
-    $(document).on('click', 'body', function(){
-        $('#sidebar').empty();
+    $(document).on('click', 'body', function(e){
+        if (e.target.nodeName == 'BODY'){ // filter out all delegated events
+            $.pjax({url: '/', container:'#target'});
+        }
     }); 
-    */
 
     
     filter_list = function(query) {
@@ -50,7 +65,7 @@ $(function() {
         });
     }
 
-    $('#search').bind('change paste keyup', function(e) {
+    $('#search').on('change paste keyup', function(e) {
         var search = $(this)
         if (e.keyCode == 27) { // Escape
             search.val('');
@@ -64,7 +79,7 @@ $(function() {
         }
     });
     
-    $('#list_category').bind('change', function(e) {
+    $('#list_category').on('change', function(e) {
         if ($(this).val()){
             url = '/list/'+$(this).val();
         } else {
@@ -74,94 +89,15 @@ $(function() {
     });
 
 
-    $('.reset').bind('click', function(e) {
+    $('.reset').on('click', function(e) {
         var t = $(this).data('target');
         $(t).val('');
         $(t).trigger('change');
-    });
 
-
-    $('datepicker .reset').unbind('click').bind('click', function(e) {
-        $('.datepicker').val('');
-        // Clear session values "from" and "until" as well
-        $.pjax({url: '/ignore_availability', container:'#target'});
-    });
-})
-
-/*
-(function( app, $, undefined ) {
-
-    dispatch = function( resource ){
-        console.log('dispatching '+resource+'.');
-        $.getJSON($ROOT + resource, {json: true}, function(response){
-            html = $(response.html);
-            history.pushState(response.resource, 'Stock', response.resource);
-            html.each( function(index, chunk){
-                chunk = $(chunk);
-                target = chunk.attr('id');
-                if (chunk.is('div') && target){ 
-                    console.log('dispatch target: '+target);
-                    $('#'+target).replaceWith(chunk);
-                }
-            });
-        });
-    }
-
-    // bind post link handler (leaving of page)
-    //$(document).on('click', 'a[target="post"]', function(){
-
-    app.post = function(ev){
-        console.log('post');
-        data = $('input, textarea').serialize()
-        $('.post').each( function(){
-            data += $(this).attr('name')+'='+$(this).html()+'&'
-        });
-        $.post($ROOT+window.location.pathname, data, function(){
-            going_to = $(document).data('get');
-            alert('aye!'+going_to);
-        });
-        ev.preventDefault();
-    }
-
-    // bind ajax link handler
-    //$(document).on('click', 'a[target="ajax"]', function(){
-
-    app.get = function(ev){
-        console.log('get');
-        dispatch( $(this).attr('href') );
-        ev.preventDefault();
-    }
-
-    app.sync_post_get = function(ev){
-        console.log('sync post get');
-        data = $('input, textarea').serialize()
-        $(document).data('get', $(this).attr('href') );
-        $('.post').each( function(){
-            data += $(this).attr('name')+'='+$(this).html()+'&'
-        });
-        $.post($ROOT+window.location.pathname, data, function(){
-            dispatch( $(document).data('get') );
-        });
-        ev.preventDefault();
-    }
-
-    $(document).on('click', 'a[target="post"]', app.post ); 
-    $(document).on('click', 'a[target="get"]', app.get ); 
-    $(document).on('click', 'a[target="get post"]', app.sync_post_get ); 
-
-
-    // bind browser-back event
-    $(window).bind('popstate', function(event){
-        if (event.originalEvent.state){
-            dispatch( event.originalEvent.state );
+        var url = $(this).data('url');
+        if (url){
+            $.pjax({url: url, container:'#target'});
         }
     });
 
-    // dispatch current location url after load
-    dispatch( window.location.pathname );
-
-    app.ready = function(){
-    }
-
-}( window.app = window.app || {}, jQuery ));
-*/
+})
