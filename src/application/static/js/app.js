@@ -1,45 +1,43 @@
 $(function() {
-    $(document).pjax('a', '#target');
+    $(document).pjax('a', '#target', {scrollTo: false});
 
-    $(document).ready(function(){
-        // Configure date picker for selection
-        config = {
-            days: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
-            months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-            show_select_today: false,
-            show_clear_date: false,
-            show_icon: false,
-            direction: true,
-            default_position: 'below',
-            format: 'j. M Y',
-            
-            onSelect: function(){
-                var from = $('#from').val();
-                var until = $('#until').val();
-
-                from = from.replace(/ /g, '_');
-                until = until.replace(/ /g, '_');
-
-                if (from && until){
-                    var url = '/available/between/'+from+'/and/'+until; 
-                    $.pjax({url: url, container:'#target'});
-                }
-            }
-        };
+    // Configure date picker for selection
+    config = {
+        days: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+        months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+        show_select_today: false,
+        show_clear_date: false,
+        show_icon: false,
+        direction: true,
+        default_position: 'below',
+        format: 'j. M Y',
         
+        onSelect: function(){
+            var from = $('#from').val();
+            var until = $('#until').val();
+
+            from = from.replace(/ /g, '_');
+            until = until.replace(/ /g, '_');
+
+            if (from && until){
+                var url = '/filter/between/'+from+'/and/'+until; 
+                $.pjax({url: url, container:'#target'});
+            }
+        }
+    };
+    $(document).ready(function(){
         $('#from.datepicker').Zebra_DatePicker(config);
         $('#until.datepicker').Zebra_DatePicker(config);
-
+    })
         
-        // Configure date picker for availability
-        config.always_visible = $('#calendar_');
-        config.onSelect = null;
-        config.disabled_dates = ['* * * 3,6'];
+    // Configure read-only date picker
+    //config.always_visible = $('#calendar_');
+    //config.onSelect = null;
 
-        $('#calendar.datepicker').Zebra_DatePicker(config);
+    $(document).on('pjax:end', function() {
+        $('#search').trigger('change');
+    })
         
-
-    }) // document.ready
     
     // Provide "deselecting"/
     $(document).on('click', 'body', function(e){
@@ -49,7 +47,7 @@ $(function() {
     }); 
 
     
-    filter_list = function(query) {
+    search_list = function(query) {
         fuzzy = function(needle, hay){
             return hay.toLowerCase().search(needle.toLowerCase()) > 0
         }
@@ -70,20 +68,20 @@ $(function() {
         if (e.keyCode == 27) { // Escape
             search.val('');
             search.blur();
-            filter_list( $(this).val() );
+            search_list( $(this).val() );
         }
         else if (e.keyCode == 13) { // Enter
             search.blur();
         } else {
-            filter_list( $(this).val() );
+            search_list( $(this).val() );
         }
     });
     
     $('#list_category').on('change', function(e) {
         if ($(this).val()){
-            url = '/list/'+$(this).val();
+            url = '/filter/category/'+$(this).val();
         } else {
-            url = '/list';
+            url = '/filter/category/all';
         }
         $.pjax({url: url, container:'#target'});
     });

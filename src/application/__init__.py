@@ -29,6 +29,10 @@ def jinja_cash(amount):
 app.jinja_env.filters['cash'] = jinja_cash
 
 
+def jinja_date(timestamp):
+    pass
+
+
 
 '''
 @app.context_processor

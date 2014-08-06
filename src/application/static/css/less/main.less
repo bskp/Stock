@@ -10,9 +10,11 @@
 @yellow: #fff44f;
 @black: #000;
 @white: #fff;
+@shade: #eee;
 @gray: #777;
 @gray_light: #ddd;
 @accent: #00A7DB;
+@alt: rgb(245, 115, 8);
 
 
 @text:          @black;
@@ -36,7 +38,7 @@ header{
         text-transform: uppercase;
         font-size: 20px;
         margin: 0;
-        color: #fff;
+        color: @white;
     }
 
     input, select{ color: #fff; }
@@ -91,11 +93,27 @@ header{
 
 
 #flash{
-    position: absolute;
-    bottom: 0;
+    position: fixed;
+    bottom: 3em;
     margin: 0.2em 1em;
     font-style: italic;
 }
+
+#cart{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.2em 1em;
+
+    background-color: @accent;
+    color: @white;
+    font-size: 20px;
+
+    i { font-size: 1.2em; }
+    a { margin-left: 1em; }
+}
+
 
 body,html{ height: 100%; }
 
@@ -192,15 +210,19 @@ a:hover i{
     text-decoration: none;
     color: @accent;
 }
+
 header a:hover i{
     color: @white;
 }
 
 .btn{
+    display: inline-block;
+    width: 8em;
+    padding: 0.2em 0.4em;
     margin-top: 1em;
+
+    background-color: @shade;
     cursor: pointer;
-    display: block;
-    width: 11em;
     text-align: left;
     border-top: 1px solid black;
 
@@ -208,6 +230,26 @@ header a:hover i{
         text-decoration: none;
         background-color: @accent;
     }
+
+    &.buy:hover{
+        background-color: @alt;
+    }
+}
+
+span.btn{
+    cursor: default;
+    color: @gray_light;
+
+    &:hover{
+        background-color: @shade;
+    }
+}
+    
+
+i.inset{
+    margin-left: -1.6em;
+    margin-right: 0.45em;
+    font-size: 20px;
 }
 
 .pricelist{
@@ -235,14 +277,12 @@ header a:hover i{
 
 }
 
-.in_cart{
-    &:hover::after{
-        content: attr(title);
-        font-weight: bold;
-        text-transform: uppercase;
-        font-size: 0.8em;
-        white-space: nowrap;
-    }
+#calendar{
+    display: none;
+}
+
+#calendar_{
+    height: 240px;
 }
 
 ul.items{
@@ -295,6 +335,25 @@ ul.items{
                 background-color: @white;
                 line-height: 0.9em;
                 padding: 0.5em 0;
+            }
+
+            sup {
+                font-size: 18px;
+                line-height: 1em;
+                display: inline-block;
+                position:relative;
+
+                color: white;
+                background-color: @accent;
+                .border-radius(50px);
+                padding: 0 0.3em 0.2em 0.3em;
+                position: relative;
+                left: 50px;
+                top: 16px;
+                border: 2px solid  @white;
+                margin: 0 -5px;
+
+                &.buy{ background-color: @alt; }
             }
 
         } // a

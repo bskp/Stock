@@ -5,9 +5,10 @@ Sqlite datastore models
 """
 
 from application import db
+from flask import session
 
 # Categories for items
-CATEGORIES = ['', 'outdoor','indoor','vehicle','merchandise', 'machines']
+CATEGORIES = ['all', 'outdoor','indoor','vehicle','merchandise', 'machines']
 
 class Item(db.Model):
     '''An item that can be bought or borrowed'''
@@ -30,13 +31,40 @@ class Item(db.Model):
     def __repr__(self):
         return u"<Item %s>" % (self.id)
 
-    '''
-    def in_stock(self, date):
-        #Returns the amount in stock on a given date
-        lends = Lend.query(Lend.date_end < date, Lend.date_start > date).fetch()
-        counts = [l.count for l in lends if id in l.items]
-        return count - sum(counts)
-    '''
+
+    def in_stock(self):
+        return self.count - 0#TODO amount lent during session timespan
+
+
+    def buying(self):
+        if not 'buy' in session:
+            return 0
+        if not self.id in session['buy']:
+            return 0
+        return session['buy'][self.id]
+
+
+    def lending(self):
+        if not 'lend' in session:
+            return 0
+        if not self.id in session['lend']:
+            return 0
+        return session['lend'][self.id]
+
+
+    def available(self):
+        return self.in_stock() - self.buying() - self.lending()
+
+
+    def buyable(self):
+        return self.price_buy != -1
+
+
+    def lendable(self):
+        return self.price_int != -1 or \
+                   self.price_ext != -1 or \
+                   self.price_com != -1
+
 
 class Lend(db.Model):
     ''' Whenever an item is borrowed or bought, a lend entity is created '''

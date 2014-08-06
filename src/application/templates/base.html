@@ -23,7 +23,7 @@
 	</head>
 	<body>
         <header>
-            <a href="{{ url_for('home') }}"><h1>RAST-Spielmaterialverleih</h1></a>
+            <a href="{{ url_for('list') }}"><h1>RAST-Spielmaterialverleih</h1></a>
             <a class="reset" data-target="#search" style="float:right;"><i class="icon-remove-sign"></i></a>
             <input id="search" style="float:right;" type="text" placeholder="Suche"/>
 
@@ -40,7 +40,7 @@
             bis
             <input type="text" class="datepicker" value="{{ date_until|replace('_', ' ') }}" name="until" id="until">
 
-            <a class="reset" data-target=".datepicker" data-url="/ignore_availability"><i class="icon-remove-sign"></i></a>
+            <a class="reset" data-target=".datepicker,#list_category" data-url="/filter/none"><i class="icon-remove-sign"></i></a>
 
             <!--
             Tarife für

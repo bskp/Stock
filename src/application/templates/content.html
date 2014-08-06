@@ -25,7 +25,8 @@
             <a href="{{ url_for('item', id=litem.id) }}"
             title="{{ litem.description }}"
             style="background-image: url('/uploads/{{ litem.id }}.jpg');">
-
+            {% if litem.lending()>0 %}<sup>{{ litem.lending() }}</sup>{% endif %}
+            {% if litem.buying()>0 %}<sup class="buy">{{ litem.buying() }}</sup>{% endif %}
             <span>{{ litem.name }}</span>
             </a>
         </li>
@@ -44,3 +45,13 @@
     </ul>
 {% endblock %}
 </section>
+
+{% if n_in_cart > 0 %}
+{% block cart %}
+<aside id="cart">
+    {{ n_in_cart }}×<i class="icon-shopping-cart"></i>
+    <a href="{{ url_for('cart_empty') }}">Leeren</a>
+    <a href="{{ url_for('cart_checkout') }}" style="float: right;">Bestellen</a>
+</aside>
+{% endblock %}
+{% endif %}

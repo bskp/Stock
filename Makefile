@@ -1,5 +1,5 @@
 VIRTUALENV="virtualenv"
-virtualenv_dir="venv"
+virtualenv_dir="env"
 
 setup: venv deps
 

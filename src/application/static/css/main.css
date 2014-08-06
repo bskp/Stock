@@ -1498,7 +1498,7 @@ header h1 {
   text-transform: uppercase;
   font-size: 20px;
   margin: 0;
-  color: #fff;
+  color: #ffffff;
 }
 header input,
 header select {
@@ -1541,10 +1541,26 @@ header input::-webkit-input-placeholder {
   max-width: 423px;
 }
 #flash {
-  position: absolute;
-  bottom: 0;
+  position: fixed;
+  bottom: 3em;
   margin: 0.2em 1em;
   font-style: italic;
+}
+#cart {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.2em 1em;
+  background-color: #00a7db;
+  color: #ffffff;
+  font-size: 20px;
+}
+#cart i {
+  font-size: 1.2em;
+}
+#cart a {
+  margin-left: 1em;
 }
 body,
 html {
@@ -1656,16 +1672,33 @@ header a:hover i {
   color: #ffffff;
 }
 .btn {
+  display: inline-block;
+  width: 8em;
+  padding: 0.2em 0.4em;
   margin-top: 1em;
+  background-color: #eeeeee;
   cursor: pointer;
-  display: block;
-  width: 11em;
   text-align: left;
   border-top: 1px solid black;
 }
 .btn:hover {
   text-decoration: none;
   background-color: #00a7db;
+}
+.btn.buy:hover {
+  background-color: #f57308;
+}
+span.btn {
+  cursor: default;
+  color: #dddddd;
+}
+span.btn:hover {
+  background-color: #eeeeee;
+}
+i.inset {
+  margin-left: -1.6em;
+  margin-right: 0.45em;
+  font-size: 20px;
 }
 .pricelist {
   cursor: default;
@@ -1688,12 +1721,11 @@ header a:hover i {
   font-size: 0.8em;
   white-space: nowrap;
 }
-.in_cart:hover::after {
-  content: attr(title);
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 0.8em;
-  white-space: nowrap;
+#calendar {
+  display: none;
+}
+#calendar_ {
+  height: 240px;
 }
 ul.items {
   padding: 0;
@@ -1746,6 +1778,28 @@ ul.items li a span {
   background-color: #ffffff;
   line-height: 0.9em;
   padding: 0.5em 0;
+}
+ul.items li a sup {
+  font-size: 18px;
+  line-height: 1em;
+  display: inline-block;
+  color: white;
+  background-color: #00a7db;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  padding: 0 0.3em 0.2em 0.3em;
+  position: relative;
+  left: 50px;
+  top: 16px;
+  border: 2px solid #ffffff;
+  margin: 0 -5px;
+}
+ul.items li a sup.buy {
+  background-color: #f57308;
 }
 ul.items li.selected a {
   -webkit-transform: rotate(8deg);
