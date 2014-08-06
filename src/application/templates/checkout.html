@@ -1,0 +1,45 @@
+{% extends "content.html" %}
+{% block sidebar %}
+    <form action="{{ url_for('cart_submit') }}" method="post" enctype="multipart/form-data">
+    <h1>Bestellung abschliessen</h1>
+
+    <table>
+        <tr><td><h2>Miete</h2></td>
+        {% for item in lend %}
+        <tr><td>{{lend[item]}}×</td><td>{{ item.name }}</td><td>{{ item.price_int|cash }}</td>
+        {% endfor %}
+        <tr><td></td><td></td><td></td><td>{{ sum_lend|cash }}</td>
+
+
+        <tr><td><h2>Kauf</h2>
+        {% for item in buy %}
+        <tr><td>{{buy[item]}}×</td><td>{{ item.name }}</td><td>{{ item.price_buy|cash }}</td>
+        {% endfor %}
+        <tr><td></td><td></td><td></td><td>{{ sum_buy|cash }}</td>
+        <tr><td></td><td>Total</td><td></td><td>{{ (sum_buy+sum_lend)|cash }}</td>
+    </table>
+
+    <h2>Personalien</h2>
+    <label class="fill">Name <input name="name" value="" placeholder="Hans Müller" /></label>
+    <label class="fill">Email <input name="email" value="" placeholder="hamü@bluewin.ch" /></label>
+    <label class="fill">Telefon <input name="tel" value="" placeholder="079 774 25 80" /></label>
+    <label>Ich bezahle <span class="select"><select name="payment">
+        <option value="0">bar</option>
+        <option value="1">per Rechnung</option>
+    </select></span>.</label>
+
+    <label>Lieferung
+    <textarea name="remarks" placeholder="Leer lassen, wenn du's grad selbst abholst"></textarea>
+    </label>
+
+    <label>Kommentare
+    <textarea name="remarks" placeholder=""></textarea>
+    </label>
+
+    <input type="submit" class="btn" name="submit" value="Bestellen" />
+    </form>
+{% endblock %}
+
+
+{% block cart %}
+{% endblock %}
