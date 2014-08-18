@@ -10,7 +10,7 @@ from flask import request, render_template, flash, url_for, redirect, send_from_
 from werkzeug import secure_filename
 
 from application import app, make_url_safe, db
-from models import Item, Transaction, CATEGORIES, PROGRESS
+from models import Item, Transaction, Itemlist, CATEGORIES, PROGRESS
 
 from functools import wraps
 
@@ -257,17 +257,13 @@ def cart_submit():
     items = Item.query.all()
     items = {i.id: i for i in items}
 
-    to_lend = []
-    for id in lend:
-        for _ in range(lend[id]):
-            to_lend += items[id],
-    ta.lend = to_lend
 
-    to_buy = []
-    for id in buy:
-        for _ in range(buy[id]):
-            to_buy += items[id],
-    ta.buy = to_buy
+    for id in set(lend.keys()+buy.keys()):
+        l = Itemlist()
+        l.item = items[id]
+        l.buy = buy[id] if id in buy else 0
+        l.lend = lend[id] if id in lend else 0
+        ta.items += l,
 
     db.session.commit()
 

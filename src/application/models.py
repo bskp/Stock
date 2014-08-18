@@ -115,6 +115,7 @@ class Item(db.Model):
         return self.price_lend_w() is not None
 
 
+'''
 lendlist = db.Table('lendlist',
     db.Column('item_id', db.String(), db.ForeignKey('item.id')),
     db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id')),
@@ -124,6 +125,17 @@ buylist = db.Table('buylist',
     db.Column('item_id', db.String(), db.ForeignKey('item.id')),
     db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id')),
 )
+'''
+
+
+class Itemlist(db.Model):
+    ta_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
+
+    buy = db.Column(db.Integer, default=0)
+    lend = db.Column(db.Integer, default=0)
+
+    item = db.relationship("Item")
 
 
 class Transaction(db.Model):
@@ -139,10 +151,14 @@ class Transaction(db.Model):
 
     progress = db.Column(db.Enum(*PROGRESS), default='new')
 
+    items = db.relationship("Itemlist")
+
+    '''
     lend = db.relationship('Item', secondary=lendlist,
             backref=db.backref('lent', lazy='dynamic'))
     buy  = db.relationship('Item', secondary=buylist,
             backref=db.backref('bought', lazy='dynamic'))
+    '''
 
     date_start = db.Column(db.Date)
     date_end = db.Column(db.Date)
