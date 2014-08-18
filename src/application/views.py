@@ -33,11 +33,17 @@ def available_between(item):
 def pjax(template, **kwargs):
     '''Determine whether the request was made by PJAX.'''
 
+    category=''
     if 'category' in session:
-        items = Item.query.filter_by(category=session['category'])
+        category = session['category']
+        items = Item.query.filter_by(category=category)
     else:
-        items = Item.query.all()
+        items = Item.query.order_by('name').all()
 
+    group=''
+    if 'group' in session:
+        items = filter(lambda i: i.buyable() or i.lendable(), items)
+        group = session['group']
 
     if 'from_ts' and 'until_ts' in session:
         start = session['from_ts']
@@ -45,11 +51,14 @@ def pjax(template, **kwargs):
 
         items = filter(available_between, items)
 
+
     buy = session_or_empty('buy')
     buy = sum(buy.values()) if buy else 0
     lend = session_or_empty('lend')
     lend = sum(lend.values()) if lend else 0
     kwargs['n_in_cart'] = lend+buy
+
+    kwargs['logged_in'] = session_or_empty('logged_in')
 
     date_from = session_or_empty('from')
     date_until = session_or_empty('until')
@@ -62,6 +71,8 @@ def pjax(template, **kwargs):
                            items=items,
                            date_from=date_from,
                            date_until=date_until,
+                           category=category,
+                           group=group,
                            **kwargs
                            )
 
@@ -69,11 +80,9 @@ def login_required(f):
     ''' Wrapper for protected views. '''
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        '''
         if not 'logged_in' in session:
-            return redirect(url_for('login', next=request.url))
-        '''
-        flash(u'Geschützte Aktion', 'error')
+            flash(u'Du bist nicht angemeldet!', 'error')
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -88,17 +97,21 @@ def list():
 
 @app.route('/filter/category/<string:category>')
 def cat_filter(category):
+    if category == 'all':
+        session.pop('category')
+        return list()
     if not category in CATEGORIES:
         flash(u'Kategorie ungültig!', 'error')
     session['category'] = category
-    if category == 'all':
-        session.pop('category')
     return list()
 
+@app.route('/filter/group/<string:group>')
+def group_filter(group):
+    session['group'] = group
+    return list()
 
 @app.route('/filter/between/<string:start>/and/<string:end>')
 def date_filter(start='', end=''):
-    print "set time! from %s to %s" % (start, end)
     session['from'] = start
     session['until'] = end
 
@@ -110,6 +123,12 @@ def date_filter(start='', end=''):
 
         session['from_ts'] = parse_date(start)
         session['until_ts'] = parse_date(end)
+
+    # Apply causality
+    if session['from_ts'] > session['until_ts']:
+        session['from_ts'], session['until_ts'] = session['until_ts'], session['from_ts']
+        session['from'], session['until'] = session['until'], session['from']
+
     return list()
 
 
@@ -176,9 +195,25 @@ def cart_empty():
 
 @app.route('/cart/checkout')
 def cart_checkout():
+
+    # read and set a cookie for 
+    # name, address, email, phone, group
+
     lend = session_or_empty('lend')
     buy = session_or_empty('buy')
-    if not 'from' in session and lend and sum(lend.values()):
+
+    days=0
+    weeks=0
+    if 'from' in session:
+        # Calculate lend duration
+        from datetime import date
+        from math import ceil
+        start = date.fromtimestamp(session['from_ts'])
+        end = date.fromtimestamp(session['until_ts'])
+        days = (end-start).days+1
+        weeks = int(ceil(days/7.0))
+
+    elif lend and sum(lend.values()):
         flash(u'Gib einen Zeitraum für deine Bestellung an ("verfügbar vom…")', 'error')
         return list()
     
@@ -188,18 +223,39 @@ def cart_checkout():
     lend = {items[i]: lend[i] for i in lend if lend[i]>0}
     buy  = {items[i]: buy[i] for i in buy if buy[i]>0}
 
-    sum_lend = sum( [i.price_int*lend[i] for i in lend] )
+    multiplier = lambda i: lend[i]*days if i.tax_per_day else lend[i]*weeks
+    sum_lend = sum( [i.price_lend()*multiplier(i) for i in lend] )
     sum_buy = sum( [i.price_buy*buy[i] for i in buy] )
+    total = sum_lend+sum_buy
 
     return pjax('checkout.html',
                 lend=lend,
                 buy=buy,
-                sum_lend=sum_lend,
-                sum_buy=sum_buy,
+                total=total,
+                days=days,
+                weeks=weeks
                 )
 
 @app.route('/cart/submit', methods=['POST'])
 def cart_submit():
+    lend = Lend()
+    db.session.add(lend)
+    
+    lend.name = request.form.get('name')
+    lend.email = request.form.get('email')
+    lend.tel = request.form.get('tel')
+    lend.payment = request.form.get('payment')
+    lend.delivery = request.form.get('delivery')
+    lend.remarks = request.form.get('remarks')
+
+    lend.date_start = session_or_empty('from_ts')
+    lend.date_end = session_or_empty('until_ts')
+    lend.date = ''
+
+
+    lend.lend = session
+    lend.buy = session
+
     flash(u'Danke für deine Bestellung!')
     return list()
     #return pjax('.html')
@@ -211,11 +267,6 @@ def item(id):
     return pjax('detail.html',
                 item=Item.query.get_or_404(id),
                ) 
-
-
-@app.route('/item/<id>/edit', methods=['GET', 'POST'])
-def item_edit(id):
-    return item_create(id)
 
 
 @app.route('/item/<id>/destroy', methods=['GET', 'POST'])
@@ -232,20 +283,29 @@ def item_destroy(id):
     return redirect(url_for('list'))
 
 
-@app.route('/item_create', methods=['GET', 'POST'])
+@app.route('/item_create', methods=['GET'])
+@app.route('/item/<id>/edit', methods=['GET'])
 @login_required
-def item_create(replace=None):
-    if replace:
-        item = Item.query.get_or_404(replace)
+def item_edit(id=None):
+    if id:
+        item = Item.query.get_or_404(id)
     else:
-        item = None
+        item = Item()
+        item.count = 1
+        item.name = ''
 
     # Require form
     if request.method == 'GET':
         return pjax('create_item.html', item=item)
 
-    # else POST: save to db
-    if not item:
+
+@app.route('/item_update', methods=['POST'])
+@app.route('/item/<id>/update', methods=['POST'])
+def item_post(id=None):
+    if id:
+        item = Item.query.get_or_404(id)
+    else:
+        print 'ADDING NEW ITEM'
         replace = make_url_safe(request.form.get('name'))
         item = Item(id=replace)
         db.session.add(item)
@@ -254,16 +314,16 @@ def item_create(replace=None):
     item.description = request.form.get('description')
     item.count = int(request.form.get('count')) if request.form.get('count') else 1
 
-    item.price_int = float(request.form.get('price_int')) if request.form.get('price_int') else -1
-    item.price_ext = float(request.form.get('price_ext')) if request.form.get('price_ext') else -1
-    item.price_com = float(request.form.get('price_com')) if request.form.get('price_com') else -1
-    item.price_buy = float(request.form.get('price_buy')) if request.form.get('price_buy') else -1
+    item.lend_w_int = float(request.form.get('lend_w_int')) if request.form.get('lend_w_int') else None
+    item.lend_w_edu = float(request.form.get('lend_w_edu')) if request.form.get('lend_w_edu') else None
+    item.lend_w_ext = float(request.form.get('lend_w_ext')) if request.form.get('lend_w_ext') else None
+    item.price_buy = float(request.form.get('price_buy')) if request.form.get('price_buy') else None
 
-    item.tax_per_day = True if request.form.get('tax_per_day')==1 else False
     item.category = request.form.get('category')
 
     db.session.commit()
 
+    # Update image if necessary
     file = request.files['image']
     if file:
         import os
@@ -299,25 +359,46 @@ def item_create(replace=None):
 
 
 @app.route('/login', methods=['GET', 'POST'])
-@app.route('/login/<path:next>', methods=['GET', 'POST'])
-def login(next=''):
+def login():
+    from Crypto.Hash import SHA256
+    from Crypto.Random import get_random_bytes
+    from base64 import b64encode
+
+    if 'logged_in' in session:
+        flash('Du bist bereits angemeldet')
+        return redirect(url_for('list'))
+
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            flash(u'Ungültiger Name!', 'error')
-        elif request.form['password'] != app.config['PASSWORD']:
-            flash(u'Ungültiges Kennwort!', 'error')
-        else:
+        challenge = session['challenge']
+        hsh_given = request.form['hash']
+        h = SHA256.new(challenge+app.config['PASSWORD'])
+        hsh_valid = h.hexdigest()
+
+        if hsh_valid == hsh_given:
             session['logged_in'] = True
             flash('Du bist jetzt angemeldet.')
-            return redirect(next)
-    return pjax('login.html', next=next)
+            return redirect(url_for('list'))
+
+        flash(u'Ungültiges Kennwort!', 'error')
+    
+    challenge = b64encode(get_random_bytes(64))
+    session['challenge'] = challenge
+    return pjax('login.html', challenge=challenge)
 
 
 @app.route('/logout')
 @login_required
 def logout():
+    flash('Abgemeldet!')
     session.pop('logged_in', None)
     return redirect(url_for('list'))
+
+
+@app.route('/admin')
+@login_required
+def admin():
+    lends = Lend.query.all()
+    return pjax('admin.html', lends=lends)
 
 
 @app.route('/uploads/<path:filename>')

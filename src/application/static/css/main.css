@@ -1487,11 +1487,59 @@ body {
   background-color: #dddddd;
   margin: 0 auto;
   color: #000000;
-  min-width: 777px;
+  min-width: 927px;
+}
+.on_accent {
+  color: #000000;
+  background-color: #00a7db;
+}
+.on_accent a,
+.on_accent input,
+.on_accent select {
+  color: #ffffff;
+}
+.on_accent a:hover,
+.on_accent input:hover,
+.on_accent select:hover {
+  color: #000000;
+}
+.on_accent a:hover i,
+.on_accent input:hover i,
+.on_accent select:hover i {
+  color: #ffffff;
+}
+.on_accent input,
+.on_accent select {
+  border-bottom: 2px solid #ffffff;
+  background: transparent;
+}
+.on_accent input::-webkit-input-placeholder,
+.on_accent select::-webkit-input-placeholder {
+  /* WebKit browsers */
+
+  color: #000000;
+}
+.on_accent input:-moz-placeholder,
+.on_accent select:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+
+  color: #000000;
+}
+.on_accent input::-moz-placeholder,
+.on_accent select::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+
+  color: #000000;
+}
+.on_accent input:-ms-input-placeholder,
+.on_accent select:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+
+  color: #000000;
 }
 header {
-  background-color: #00a7db;
   color: #000000;
+  background-color: #00a7db;
   padding: 0 1em 0.4em 1em;
 }
 header h1 {
@@ -1500,11 +1548,48 @@ header h1 {
   margin: 0;
   color: #ffffff;
 }
+header a,
 header input,
 header select {
-  color: #fff;
+  color: #ffffff;
 }
-header input::-webkit-input-placeholder {
+header a:hover,
+header input:hover,
+header select:hover {
+  color: #000000;
+}
+header a:hover i,
+header input:hover i,
+header select:hover i {
+  color: #ffffff;
+}
+header input,
+header select {
+  border-bottom: 2px solid #ffffff;
+  background: transparent;
+}
+header input::-webkit-input-placeholder,
+header select::-webkit-input-placeholder {
+  /* WebKit browsers */
+
+  color: #000000;
+}
+header input:-moz-placeholder,
+header select:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+
+  color: #000000;
+}
+header input::-moz-placeholder,
+header select::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+
+  color: #000000;
+}
+header input:-ms-input-placeholder,
+header select:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+
   color: #000000;
 }
 #target {
@@ -1546,15 +1631,111 @@ header input::-webkit-input-placeholder {
   margin: 0.2em 1em;
   font-style: italic;
 }
+#admin {
+  position: absolute;
+  top: 0;
+  font-size: 1.4em;
+  right: 0.5em;
+  color: #000000;
+  background-color: #00a7db;
+}
+#admin a,
+#admin input,
+#admin select {
+  color: #ffffff;
+}
+#admin a:hover,
+#admin input:hover,
+#admin select:hover {
+  color: #000000;
+}
+#admin a:hover i,
+#admin input:hover i,
+#admin select:hover i {
+  color: #ffffff;
+}
+#admin input,
+#admin select {
+  border-bottom: 2px solid #ffffff;
+  background: transparent;
+}
+#admin input::-webkit-input-placeholder,
+#admin select::-webkit-input-placeholder {
+  /* WebKit browsers */
+
+  color: #000000;
+}
+#admin input:-moz-placeholder,
+#admin select:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+
+  color: #000000;
+}
+#admin input::-moz-placeholder,
+#admin select::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+
+  color: #000000;
+}
+#admin input:-ms-input-placeholder,
+#admin select:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+
+  color: #000000;
+}
 #cart {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   padding: 0.2em 1em;
+  color: #000000;
   background-color: #00a7db;
-  color: #ffffff;
   font-size: 20px;
+}
+#cart a,
+#cart input,
+#cart select {
+  color: #ffffff;
+}
+#cart a:hover,
+#cart input:hover,
+#cart select:hover {
+  color: #000000;
+}
+#cart a:hover i,
+#cart input:hover i,
+#cart select:hover i {
+  color: #ffffff;
+}
+#cart input,
+#cart select {
+  border-bottom: 2px solid #ffffff;
+  background: transparent;
+}
+#cart input::-webkit-input-placeholder,
+#cart select::-webkit-input-placeholder {
+  /* WebKit browsers */
+
+  color: #000000;
+}
+#cart input:-moz-placeholder,
+#cart select:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+
+  color: #000000;
+}
+#cart input::-moz-placeholder,
+#cart select::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+
+  color: #000000;
+}
+#cart input:-ms-input-placeholder,
+#cart select:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+
+  color: #000000;
 }
 #cart i {
   font-size: 1.2em;
@@ -1565,20 +1746,6 @@ header input::-webkit-input-placeholder {
 body,
 html {
   height: 100%;
-}
-#modal {
-  width: 600px;
-  margin: 0 auto;
-  padding: 10px;
-  -webkit-box-shadow: #666 0 2px 30px;
-  -moz-box-shadow: #666 0 2px 30px;
-  box-shadow: #666 0 2px 30px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding;
-  background-clip: padding-box;
 }
 body {
   font-family: gyro;
@@ -1599,51 +1766,53 @@ select {
   font-size: inherit;
   font-style: inherit;
   border-style: none;
-  border-bottom: 2px solid #ffffff;
   letter-spacing: inherit;
   word-spacing: inherit;
-  background: transparent;
   color: inherit;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  border-radius: 0px;
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding;
-  background-clip: padding-box;
-  -webkit-appereance: none;
-}
-#sidebar textarea,
-#sidebar input,
-#sidebar select {
   background-color: #dddddd;
 }
-#sidebar textarea::-webkit-input-placeholder,
-#sidebar input::-webkit-input-placeholder,
-#sidebar select::-webkit-input-placeholder {
+textarea::-webkit-input-placeholder,
+input::-webkit-input-placeholder,
+select::-webkit-input-placeholder {
   /* WebKit browsers */
 
   color: #777777;
 }
-#sidebar textarea:-moz-placeholder,
-#sidebar input:-moz-placeholder,
-#sidebar select:-moz-placeholder {
+textarea:-moz-placeholder,
+input:-moz-placeholder,
+select:-moz-placeholder {
   /* Mozilla Firefox 4 to 18 */
 
   color: #777777;
 }
-#sidebar textarea::-moz-placeholder,
-#sidebar input::-moz-placeholder,
-#sidebar select::-moz-placeholder {
+textarea::-moz-placeholder,
+input::-moz-placeholder,
+select::-moz-placeholder {
   /* Mozilla Firefox 19+ */
 
   color: #777777;
 }
-#sidebar textarea:-ms-input-placeholder,
-#sidebar input:-ms-input-placeholder,
-#sidebar select:-ms-input-placeholder {
+textarea:-ms-input-placeholder,
+input:-ms-input-placeholder,
+select:-ms-input-placeholder {
   /* Internet Explorer 10+ */
 
   color: #777777;
+}
+.fill textarea,
+.fill input,
+.fill select {
+  width: 300px;
+  float: right;
+}
+.fill span textarea,
+.fill span input,
+.fill span select {
+  width: 302px;
+  padding-left: 1px;
+}
+.fill {
+  clear: right;
 }
 label {
   display: block;
@@ -1653,13 +1822,19 @@ textarea {
   height: 6em;
 }
 .select select {
-  border-radius: 0;
   -webkit-appearance: none;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  cursor: pointer;
 }
 input.datepicker {
   width: 6.2em;
   text-align: center;
-  cursor: text;
+  cursor: pointer;
 }
 a i {
   cursor: pointer;
@@ -1668,15 +1843,12 @@ a:hover i {
   text-decoration: none;
   color: #00a7db;
 }
-header a:hover i {
-  color: #ffffff;
-}
 .btn {
   display: inline-block;
   width: 8em;
   padding: 0.2em 0.4em;
   margin-top: 1em;
-  background-color: #eeeeee;
+  background-color: #dddddd;
   cursor: pointer;
   text-align: left;
   border-top: 1px solid black;
@@ -1690,36 +1862,15 @@ header a:hover i {
 }
 span.btn {
   cursor: default;
-  color: #dddddd;
+  color: #777777;
 }
 span.btn:hover {
-  background-color: #eeeeee;
+  background-color: #dddddd;
 }
 i.inset {
   margin-left: -1.6em;
   margin-right: 0.45em;
   font-size: 20px;
-}
-.pricelist {
-  cursor: default;
-}
-.pricelist span {
-  font-weight: bold;
-}
-.pricelist span::after {
-  content: ' /';
-  font-weight: normal;
-}
-.pricelist span:hover::before {
-  content: attr(title);
-  position: relative;
-  width: 0;
-  top: -1.4em;
-  display: inline-block;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 0.8em;
-  white-space: nowrap;
 }
 #calendar {
   display: none;
@@ -1780,7 +1931,7 @@ ul.items li a span {
   padding: 0.5em 0;
 }
 ul.items li a sup {
-  font-size: 18px;
+  font-size: 28px;
   line-height: 1em;
   display: inline-block;
   color: white;
@@ -1791,12 +1942,12 @@ ul.items li a sup {
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
-  padding: 0 0.3em 0.2em 0.3em;
+  padding: 0 0.3em 0.15em 0.3em;
   position: relative;
-  left: 50px;
-  top: 16px;
+  left: 40px;
+  top: 10px;
   border: 2px solid #ffffff;
-  margin: 0 -5px;
+  margin: 0 -0.25em;
 }
 ul.items li a sup.buy {
   background-color: #f57308;
@@ -1810,6 +1961,26 @@ ul.items li.selected a {
 }
 ul.items li a.hidden {
   opacity: 0.2;
+}
+#sidebar table {
+  width: 100%;
+}
+#sidebar table tr:last-child td:last-child {
+  border-top: 1px solid #000000;
+  font-weight: bold;
+}
+#sidebar table tr.head {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+#sidebar table tr.head td {
+  padding-top: 1em;
+}
+#sidebar table td {
+  text-align: right;
+}
+#sidebar table td:first-child {
+  text-align: left;
 }
 .Zebra_DatePicker *,
 .Zebra_DatePicker *:after,

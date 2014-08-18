@@ -8,4 +8,5 @@ Flask
 SQLAlchemy
 Flask-SQLAlchemy
 unidecode
+pycrypto
 

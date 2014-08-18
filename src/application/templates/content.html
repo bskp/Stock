@@ -32,19 +32,32 @@
         </li>
         {% endfor %}
 
+
+        {% if logged_in %}
         <li style="opacity: 0.5;"
         {% if item is sameas none %}
             class="selected"
         {% endif -%}
             >
-        <a href="{{ url_for('item_create') }}"
+        <a href="{{ url_for('item_edit') }}"
             style="background-image: url('{{url_for('static', filename='img/create_bg.svg')}}');">
             <span>Neu</span>
             </a>
         </li>
+        {% endif -%}
     </ul>
 {% endblock %}
 </section>
+
+{% if logged_in %}
+{% block admin %}
+<div id="admin">
+    <span>CHEF-MODUS</span>
+    <a href="{{ url_for('logout') }}"><i class="icon-eject"></i></a>
+    <a href="{{ url_for('admin') }}"><i class="icon-tasks"></i></a>
+</div>
+{% endblock %}
+{% endif %}
 
 {% if n_in_cart > 0 %}
 {% block cart %}

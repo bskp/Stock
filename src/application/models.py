@@ -7,8 +7,10 @@ Sqlite datastore models
 from application import db
 from flask import session
 
-# Categories for items
+# Enums
 CATEGORIES = ['all', 'outdoor','indoor','vehicle','merchandise', 'machines']
+PROGRESS = ['new', 'confirmed', 'returned']
+
 
 class Item(db.Model):
     '''An item that can be bought or borrowed'''
@@ -18,11 +20,15 @@ class Item(db.Model):
     count = db.Column(db.Integer, default=1)
     # The corresponding image is saved saved under uploads/<entity.id>.jpg
 
-    price_int = db.Column(db.Float)
-    price_ext = db.Column(db.Float)
-    price_com = db.Column(db.Float)
+    lend_w_int = db.Column(db.Float)
+    lend_w_edu = db.Column(db.Float)
+    lend_w_ext = db.Column(db.Float)
+
+    lend_d_int = db.Column(db.Float)
+    lend_d_edu = db.Column(db.Float)
+    lend_d_ext = db.Column(db.Float)
+    
     price_buy = db.Column(db.Float)
-    tax_per_day = db.Column(db.Boolean(), default=False) # taxing option for e.g. cars
 
     category = db.Column(db.Enum(*CATEGORIES))
     #related = relationship('Item', order_by='Item.id')
@@ -57,13 +63,30 @@ class Item(db.Model):
 
 
     def buyable(self):
-        return self.price_buy != -1
+        return self.price_buy is not None
+
+    def price_lend(self):
+        group = 'int'
+        if 'group' in session:
+            group = session['group']
+        return getattr(self, 'lend_w_'+group)
+
+
+    def tax_per_day(self):
+        group = 'int'
+        if 'group' in session:
+            group= session['group']
+        return getattr(self, 'lend_d_'+group) is not None
 
 
     def lendable(self):
-        return self.price_int != -1 or \
-                   self.price_ext != -1 or \
-                   self.price_com != -1
+        return self.price_lend() is not None
+
+
+itemlist = db.Table('itemlist',
+    db.Column('item_id', db.String(), db.ForeignKey('item.id')),
+    db.Column('lend_id', db.Integer, db.ForeignKey('lend.id')),
+)
 
 
 class Lend(db.Model):
@@ -77,8 +100,12 @@ class Lend(db.Model):
     delivery = db.Column(db.Unicode()) # Address
     remarks = db.Column(db.UnicodeText())
 
-    #items = ndb.KeyProperty(kind='Item', repeated=True)
-    #item_amounts = ndb.IntegerProperty(repeated=True)
+    progress = db.Column(db.Enum(*PROGRESS), default='new')
+
+    lend = db.relationship('Item', secondary=itemlist,
+            backref=db.backref('lent', lazy='dynamic'))
+    buy  = db.relationship('Item', secondary=itemlist,
+            backref=db.backref('bought', lazy='dynamic'))
 
     date_start = db.Column(db.Date)
     date_end = db.Column(db.Date)

@@ -1,39 +1,43 @@
 {% extends "content.html" %}
 
 {% block sidebar %}
-    <form action="{{ url_for('item_create') }}" method="post" enctype="multipart/form-data">
+    <form action="{{ url_for('item_post', id=item.id) }}" method="post" enctype="multipart/form-data">
     <h1><input name="name" value="{{item.name}}" placeholder="Name" /></h1>
     <h2>
     <span class="select"><select name="category">
-        <option value="">(Keine Kategorie)</option>
-        <option value="outdoor">Spielmaterial draussen</option>
-        <option value="indoor">Spielmaterial drinnen</option>
-        <option value="vehicle">Vehikel</option>
-        <option value="merchandise">Fan-Artikel</option>
-        <option value="machines">Maschinen</option>
+        <option {{ item.category|option() }}>(Keine Kategorie)</option>
+        <option {{ item.category|option('outdoor') }}>Spielmaterial draussen</option>
+        <option {{ item.category|option('indoor') }}>Spielmaterial drinnen</option>
+        <option {{ item.category|option('vehicle') }}>Vehikel</option>
+        <option {{ item.category|option('merchandise') }}>Fan-Artikel</option>
+        <option {{ item.category|option('machines') }}>Maschinen</option>
     </select>
     </span>
     </h2>
 
-    <p id="description"><textarea name="description" placeholder="Beschreibung">{{item.description}}</textarea></p>
+    <p id="description"><textarea name="description" placeholder="Beschreibung">{{item.description|default('', true)}}</textarea></p>
 
-    <label>Exemplare: <input name="count" value="{{item.count}}" placeholder="Anzahl" style="width: 2em;"/>× </label>
+    <label>Exemplare: <input name="count" value="{{item.count}}" style="width: 2em;"/>× </label>
 
-    <h2>Miete</h2>
-    <label>Fr. <input name="price_int" value="{{item.price_int}}" placeholder="nicht vermietbar an" />Jubla-Scharen</label>
-    <label>Fr. <input name="price_ext" value="{{item.price_ext}}" placeholder="nicht vermietbar an" />Jugendvereine</label>
-    <label>Fr. <input name="price_com" value="{{item.price_com}}" placeholder="nicht vermietbar an" />Sportvereine</label>
-    <label>Preis pro <select name="precise_tax">
-        <option value="0">Woche</option>
-        <option value="1">Tag</option>
-    </select></label>
+    <h2>Miete pro Woche</h2>
+    <label>Fr. <input name="lend_w_int" value="{{item.lend_w_int|float('')}}" placeholder="nicht vermietbar an" />Jubla-Scharen</label>
+    <label>Fr. <input name="lend_w_edu" value="{{item.lend_w_edu|float('')}}" placeholder="nicht vermietbar an" />Schulen</label>
+    <label>Fr. <input name="lend_w_ext" value="{{item.lend_w_ext|float('')}}" placeholder="nicht vermietbar an" />Externe</label>
+
+    <h2>Miete pro Tag</h2>
+    <label>Fr. <input name="lend_d_int" value="{{item.lend_d_int|float('')}}" placeholder="pro Woche abrechnen" />Jubla-Scharen</label>
+    <label>Fr. <input name="lend_d_edu" value="{{item.lend_d_edu|float('')}}" placeholder="pro Woche abrechnen" />Schulen</label>
+    <label>Fr. <input name="lend_d_ext" value="{{item.lend_d_ext|float('')}}" placeholder="pro Woche abrechnen" />Externe</label>
 
     <h2>Kauf</h2>
-    <label>Fr. <input name="price_buy" value="{{item.price_buy}}" placeholder="unverkäuflich" /></label>
+    <label>Fr. <input name="price_buy" value="{{item.price_buy|float('')}}" placeholder="unverkäuflich" /></label>
 
     <input name="image" type="file" accept="image/*" placeholder="Bild auswählen"/>
+    <br />
 
     <input type="submit" class="btn" name="ok" value="OK" />
-    </form>
+    {% if item.id != None %}
     <a href="{{ url_for('item_destroy', id=item.id) }}" class="btn">Zerstören!</a>
+    {% endif %}
+    </form>
 {% endblock %}

@@ -28,12 +28,18 @@
             <input id="search" style="float:right;" type="text" placeholder="Suche"/>
 
             <span class="select"><select name="category" id="list_category">
-                <option value="">Alle Artikel</option>
-                <option value="outdoor">Spielmaterial draussen</option>
-                <option value="indoor">Spielmaterial drinnen</option>
-                <option value="vehicle">Vehikel</option>
-                <option value="merchandise">Fan-Artikel</option>
-                <option value="machines">Maschinen</option>
+                <option {{ category|option() }}>Alle Artikel</option>
+                <option {{ category|option('outdoor') }}>Spielmaterial draussen</option>
+                <option {{ category|option('indoor') }}>Spielmaterial drinnen</option>
+                <option {{ category|option('vehicle') }}>Vehikel</option>
+                <option {{ category|option('merchandise') }}>Fan-Artikel</option>
+                <option {{ category|option('machines') }}>Maschinen</option>
+            </select></span>
+            für 
+            <span class="select"><select name="group" id="list_group">
+                <option {{ group|option('int') }}>Jubla-Scharen</option>
+                <option {{ group|option('edu') }}>Schulen</option>
+                <option {{ group|option('ext') }}>Externe</option>
             </select></span>
             verfügbar vom
             <input type="text" class="datepicker" value="{{ date_from|replace('_', ' ') }}" name="from" id="from">
@@ -41,25 +47,6 @@
             <input type="text" class="datepicker" value="{{ date_until|replace('_', ' ') }}" name="until" id="until">
 
             <a class="reset" data-target=".datepicker,#list_category" data-url="/filter/none"><i class="icon-remove-sign"></i></a>
-
-            <!--
-            Tarife für
-            <span class="select"><select name="group">
-                <option value="int">JuBla-Schar</option>
-                <option value="ext">nichtkommerzieller Jugendverein</option>
-                <option value="com">Sportverein</option>
-            </select></span>
-            --!>
-
-
-            <!--
-            {# TODO: remove #}
-            {% if not session.logged_in %}
-              <a href="{{ url_for('login') }}" target="get">log in</a>
-            {% else %}
-              <a href="{{ url_for('logout') }}">log out</a>
-            {% endif %}
-            --!>
         </header>
         <div id="target">{% include template %}</div>
 	</body>

@@ -1,7 +1,9 @@
 {% extends "content.html" %}
 
 {% block sidebar %}
+    {% if logged_in %}
     <a href="{{ url_for('item_edit', id=item.id) }}" style="float: right;"><i class="icon-edit icon-2x"></i></a>
+    {% endif %}
 
     <h2>{{item.category}}</h2>
     <h1>{{item.name}}</h1>
@@ -9,7 +11,13 @@
     <img src="/uploads/full/{{ item.id }}.jpg" />
 
     <p id="description">{{item.description}}</p>
-    {{ snippets.pricelist(item) }}
+    {% if item.lendable() -%}
+        Miete: <strong>{{ item.price_lend()|cash }}</strong> /
+        {% if item.tax_per_day %}Tag{% else %}Woche{% endif %}<br />
+    {% endif %}
+    {% if item.buyable() %}
+        Kauf: <strong>{{ item.price_buy|cash }}</strong> / Stück<br />
+    {% endif %}
         
     {% if item.lendable() %}
         {% if item.available() %}

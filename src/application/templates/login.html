@@ -1,9 +1,23 @@
 {% extends "content.html" %}
+
 {% block sidebar %}
-    <h1>Geschützter Bereich</h1>
-    <form action="{{ url_for('login') }}" method="post" enctype="multipart/form-data">
-    <label>Name <input name="name" value="" placeholder="Hans-Ueli" /></label>
-    <label>Kennwort <input name="name" value="" placeholder="N7j4sk*" /></label>
+    <h1>Möge die Macht mit dir sein!</h1>
+    <input type="hidden" id="challenge" value="{{ challenge }}" />
+    <form action="{{ url_for('login') }}" method="post">
+    <label>Kennwort <input id="pw_enter" value="" /></label>
+    <input type="hidden" name="hash" id="pw_send" value="mist" />
     <input type="submit" class="btn" name="ok" value="Anmelden" />
     </form>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/sha256.js') }}"></script>
+    <script>
+        $('#pw_enter').on('keyup', function() {
+            var challenge = $('#challenge').val();
+            var pw = $('#pw_enter').val();
+            var hasher = new jsSHA(challenge+pw, "TEXT");
+            var hash = hasher.getHash("SHA-256", "HEX");
+            $('#pw_send').val(hash);
+        })
+    </script>
+
 {% endblock %}

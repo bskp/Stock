@@ -49,7 +49,7 @@ $(function() {
     
     search_list = function(query) {
         fuzzy = function(needle, hay){
-            return hay.toLowerCase().search(needle.toLowerCase()) > 0
+            return hay.toLowerCase().search(needle.toLowerCase()) > -1
         }
 
         $('.items li a').each(function(){
@@ -83,6 +83,11 @@ $(function() {
         } else {
             url = '/filter/category/all';
         }
+        $.pjax({url: url, container:'#target'});
+    });
+
+    $('#list_group').on('change', function(e) {
+        url = '/filter/group/'+$(this).val();
         $.pjax({url: url, container:'#target'});
     });
 

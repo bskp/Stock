@@ -20,6 +20,9 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///../sqlite.db'
 
 DEBUG = True
 
+# Credentials for admin
+PASSWORD = '0815'
+
 # Set secret keys for CSRF protection
 SECRET_KEY = CSRF_SECRET_KEY
 CSRF_SESSION_KEY = SESSION_KEY
