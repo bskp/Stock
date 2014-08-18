@@ -12,8 +12,11 @@
 
     <p id="description">{{item.description}}</p>
     {% if item.lendable() -%}
-        Miete: <strong>{{ item.price_lend()|cash }}</strong> /
-        {% if item.tax_per_day %}Tag{% else %}Woche{% endif %}<br />
+        Miete:
+        {% if item.price_lend_d() %}
+        <strong>{{ item.price_lend_d()|cash }}</strong> / Tag, 
+        {% endif %}
+        <strong>{{ item.price_lend_w()|cash }}</strong> / Woche<br />
     {% endif %}
     {% if item.buyable() %}
         Kauf: <strong>{{ item.price_buy|cash }}</strong> / Stück<br />
@@ -49,7 +52,7 @@
     {% if item.related %}
     <h2>Oli empfiehlt dazu:</h2>
     <ul>
-        {% for item in item.get_related() %}
+        {% for item in item.related %}
         <li><a href="{{ url_for('item', id=item.id) }}" title="{{ item.description }}">
             {{ item.name }}
         </a></li>

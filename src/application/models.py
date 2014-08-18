@@ -12,6 +12,11 @@ CATEGORIES = ['all', 'outdoor','indoor','vehicle','merchandise', 'machines']
 PROGRESS = ['new', 'confirmed', 'returned']
 
 
+related = db.Table('related',
+    db.Column('item_id', db.String(), db.ForeignKey('item.id')),
+    db.Column('related_item_id', db.String(), db.ForeignKey('item.id')),
+)
+
 class Item(db.Model):
     '''An item that can be bought or borrowed'''
     id = db.Column(db.String(), primary_key=True)
@@ -31,7 +36,9 @@ class Item(db.Model):
     price_buy = db.Column(db.Float)
 
     category = db.Column(db.Enum(*CATEGORIES))
-    #related = relationship('Item', order_by='Item.id')
+    related = db.relationship('Item', secondary=related,
+                        primaryjoin=id==related.c.item_id,
+                        secondaryjoin=id==related.c.related_item_id,)
 
 
     def __repr__(self):
@@ -65,11 +72,36 @@ class Item(db.Model):
     def buyable(self):
         return self.price_buy is not None
 
-    def price_lend(self):
+
+    def price_lend_w(self):
         group = 'int'
         if 'group' in session:
             group = session['group']
         return getattr(self, 'lend_w_'+group)
+
+
+    def price_lend_d(self):
+        group = 'int'
+        if 'group' in session:
+            group = session['group']
+        return getattr(self, 'lend_d_'+group)
+
+
+    def price_lend(self, days):
+        from math import ceil
+
+        d = self.price_lend_d()
+        w = self.price_lend_w()
+        n = 7  # days of second tax-value
+
+        if d is None:
+            # Simple taxing
+            weeks = int(ceil(days/7.0))
+            return weeks*self.price_lend_w()
+
+        # Day-based taxing
+        price = (w-d)/(n-1) * (days-1) + d
+        return ceil(price)
 
 
     def tax_per_day(self):
@@ -80,17 +112,22 @@ class Item(db.Model):
 
 
     def lendable(self):
-        return self.price_lend() is not None
+        return self.price_lend_w() is not None
 
 
-itemlist = db.Table('itemlist',
+lendlist = db.Table('lendlist',
     db.Column('item_id', db.String(), db.ForeignKey('item.id')),
-    db.Column('lend_id', db.Integer, db.ForeignKey('lend.id')),
+    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id')),
+)
+
+buylist = db.Table('buylist',
+    db.Column('item_id', db.String(), db.ForeignKey('item.id')),
+    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id')),
 )
 
 
-class Lend(db.Model):
-    ''' Whenever an item is borrowed or bought, a lend entity is created '''
+class Transaction(db.Model):
+    ''' Whenever an item is lent or bought, a transaction entity is created '''
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode())
     email = db.Column(db.Unicode())
@@ -102,12 +139,17 @@ class Lend(db.Model):
 
     progress = db.Column(db.Enum(*PROGRESS), default='new')
 
-    lend = db.relationship('Item', secondary=itemlist,
+    lend = db.relationship('Item', secondary=lendlist,
             backref=db.backref('lent', lazy='dynamic'))
-    buy  = db.relationship('Item', secondary=itemlist,
+    buy  = db.relationship('Item', secondary=buylist,
             backref=db.backref('bought', lazy='dynamic'))
 
     date_start = db.Column(db.Date)
     date_end = db.Column(db.Date)
     date = db.Column(db.DateTime)
 
+
+    def __repr__(self):
+        if self.id is not None:
+            return u"<Transaction %u>" % (self.id)
+        return u"<Transaction (no ID)>"

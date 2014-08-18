@@ -10,13 +10,13 @@ from flask import request, render_template, flash, url_for, redirect, send_from_
 from werkzeug import secure_filename
 
 from application import app, make_url_safe, db
-from models import Item, Lend, CATEGORIES
+from models import Item, Transaction, CATEGORIES, PROGRESS
 
 from functools import wraps
 
 import locale
 locale.setlocale(locale.LC_ALL, 'de_CH')
-import time
+import time, datetime
 
 
 def session_or_empty(key):
@@ -223,8 +223,7 @@ def cart_checkout():
     lend = {items[i]: lend[i] for i in lend if lend[i]>0}
     buy  = {items[i]: buy[i] for i in buy if buy[i]>0}
 
-    multiplier = lambda i: lend[i]*days if i.tax_per_day else lend[i]*weeks
-    sum_lend = sum( [i.price_lend()*multiplier(i) for i in lend] )
+    sum_lend = sum( [i.price_lend(days)*lend[i] for i in lend] )
     sum_buy = sum( [i.price_buy*buy[i] for i in buy] )
     total = sum_lend+sum_buy
 
@@ -238,23 +237,39 @@ def cart_checkout():
 
 @app.route('/cart/submit', methods=['POST'])
 def cart_submit():
-    lend = Lend()
-    db.session.add(lend)
+    lend = session_or_empty('lend')
+    buy = session_or_empty('buy')
+
+    ta = Transaction()
+    db.session.add(ta)
     
-    lend.name = request.form.get('name')
-    lend.email = request.form.get('email')
-    lend.tel = request.form.get('tel')
-    lend.payment = request.form.get('payment')
-    lend.delivery = request.form.get('delivery')
-    lend.remarks = request.form.get('remarks')
+    ta.name = request.form.get('name')
+    ta.email = request.form.get('email')
+    ta.tel = request.form.get('tel')
+    ta.payment = request.form.get('payment')
+    ta.delivery = request.form.get('delivery')
+    ta.remarks = request.form.get('remarks')
 
-    lend.date_start = session_or_empty('from_ts')
-    lend.date_end = session_or_empty('until_ts')
-    lend.date = ''
+    ta.date_start = datetime.date.fromtimestamp(session['from_ts'])
+    ta.date_end = datetime.date.fromtimestamp(session['until_ts'])
+    ta.date = datetime.datetime.now()
 
+    items = Item.query.all()
+    items = {i.id: i for i in items}
 
-    lend.lend = session
-    lend.buy = session
+    to_lend = []
+    for id in lend:
+        for _ in range(lend[id]):
+            to_lend += items[id],
+    ta.lend = to_lend
+
+    to_buy = []
+    for id in buy:
+        for _ in range(buy[id]):
+            to_buy += items[id],
+    ta.buy = to_buy
+
+    db.session.commit()
 
     flash(u'Danke für deine Bestellung!')
     return list()
@@ -305,7 +320,6 @@ def item_post(id=None):
     if id:
         item = Item.query.get_or_404(id)
     else:
-        print 'ADDING NEW ITEM'
         replace = make_url_safe(request.form.get('name'))
         item = Item(id=replace)
         db.session.add(item)
@@ -317,6 +331,11 @@ def item_post(id=None):
     item.lend_w_int = float(request.form.get('lend_w_int')) if request.form.get('lend_w_int') else None
     item.lend_w_edu = float(request.form.get('lend_w_edu')) if request.form.get('lend_w_edu') else None
     item.lend_w_ext = float(request.form.get('lend_w_ext')) if request.form.get('lend_w_ext') else None
+
+    item.lend_d_int = float(request.form.get('lend_d_int')) if request.form.get('lend_d_int') else None
+    item.lend_d_edu = float(request.form.get('lend_d_edu')) if request.form.get('lend_d_edu') else None
+    item.lend_d_ext = float(request.form.get('lend_d_ext')) if request.form.get('lend_d_ext') else None
+
     item.price_buy = float(request.form.get('price_buy')) if request.form.get('price_buy') else None
 
     item.category = request.form.get('category')

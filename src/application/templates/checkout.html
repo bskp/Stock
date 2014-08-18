@@ -9,9 +9,9 @@
         {{ weeks }} Wochen / {{ days }} Tage
         {% for item in lend %}
         <tr>
-            <td>{{ item.name }}</td><td>{{ item.price_int|cash }}</td>
-            <td>× <D-r>{{lend[item]}}</td><td>× {% if item.tax_per_day %}{{days}}{% else %}{{weeks}}{% endif %}</td>
-            <td>{% if item.tax_per_day %}{{ (days*lend[item]*item.price_lend())|cash }}{% else %}{{ (weeks*lend[item]*item.price_lend())|cash }}{% endif %}</td>
+            <td>{{ item.name }}</td><td>{{ item.price_lend_d()|cash }}</td>
+            <td>× {{lend[item]}}</td><td>× {% if item.price_lend_w() %}{{days}}{% else %}{{weeks}}{% endif %}</td>
+            <td>{{ lend[item]*item.price_lend(days)|cash }}</td>
         </tr>
         {% endfor %}
         {% endif %}

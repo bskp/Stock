@@ -37,7 +37,6 @@ def jinja_option(attr, option=''):
     ret = 'value="' + option + '"'
     if attr == option:
         ret += ' selected="selected"'
-    print ret
     ret = app.jinja_env.filters['safe'](ret)
     return ret
 app.jinja_env.filters['option'] = jinja_option
