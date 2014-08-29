@@ -6,24 +6,58 @@ Route handlers for HTML
 
 """
 
-from flask import request, render_template, flash, url_for, redirect, send_from_directory, session
+from flask import request, render_template, flash, url_for, redirect, send_from_directory, session, g
 from werkzeug import secure_filename
 
 from application import app, make_url_safe, db
-from models import Item, Transaction, Itemlist, CATEGORIES, PROGRESS
+from models import Item, Transaction, Buy, Lend, CATEGORIES, PROGRESS
 
 from functools import wraps
 
-import locale
-locale.setlocale(locale.LC_ALL, 'de_CH')
-import time, datetime
+import datetime
+import uuid
 
 
-def session_or_empty(key):
-    if key in session:
-        return session[key]
-    return ''
+'''
+def cleanup_g():
+    '' Deletes old transaction instances in g ''
 
+    if not 'transactions' in g:
+        return
+
+    now = datetime.datetime.utcnow()
+    for tr_hash in g.transactions:
+        ta = g.transactions[tr_hash]
+        print '%s: %s' % (tr_hash, now-ta.date)
+
+        if (now-ta.date).days > 3:
+            g.transactions.pop(tr_hash)
+'''
+
+@app.before_request
+def fetch_transaction():
+    from flask import session
+
+    if not 'tr_hash' in session \
+    or not hasattr(app, 'transactions') \
+    or not session['tr_hash'] in app.transactions:
+        tr_hash = uuid.uuid4()
+        session['tr_hash'] = tr_hash
+
+        if not hasattr(app, 'transactions'):
+            app.transactions = {}
+
+        app.transactions[tr_hash] = Transaction()
+        print 'Added transaction hash %s' % tr_hash
+        flash(u'New transaction', 'notice')
+    else:
+        print 'Fetched transaction %s' % session['tr_hash']
+
+    g.ta = app.transactions[session['tr_hash']]
+
+    from pprint import pprint
+    pprint(g.ta.lend)
+    pprint(g.ta.buy)
 
 def available_between(item):
     # TODO filter out unavailable items
@@ -40,41 +74,28 @@ def pjax(template, **kwargs):
     else:
         items = Item.query.order_by('name').all()
 
-    group=''
-    if 'group' in session:
+
+    ta = g.ta
+
+    if ta.group:
         items = filter(lambda i: i.buyable() or i.lendable(), items)
-        group = session['group']
 
-    if 'from_ts' and 'until_ts' in session:
-        start = session['from_ts']
-        end = session['until_ts']
-
+    if ta.date_start and ta.date_end:
         items = filter(available_between, items)
 
-
-    buy = session_or_empty('buy')
-    buy = sum(buy.values()) if buy else 0
-    lend = session_or_empty('lend')
-    lend = sum(lend.values()) if lend else 0
-    kwargs['n_in_cart'] = lend+buy
-
-    kwargs['logged_in'] = session_or_empty('logged_in')
-
-    date_from = session_or_empty('from')
-    date_until = session_or_empty('until')
+    kwargs['logged_in'] = hasattr(session, 'logged_in')
 
     if "X-PJAX" in request.headers:
-        return render_template(template, items=items, date_from=date_from, date_until=date_until, **kwargs)
+        return render_template(template, items=items, ta=ta, **kwargs)
     
     return render_template('base.html',
                            template = template,
                            items=items,
-                           date_from=date_from,
-                           date_until=date_until,
                            category=category,
-                           group=group,
+                           ta=ta,
                            **kwargs
                            )
+
 
 def login_required(f):
     ''' Wrapper for protected views. '''
@@ -105,91 +126,102 @@ def cat_filter(category):
     session['category'] = category
     return list()
 
+
 @app.route('/filter/group/<string:group>')
 def group_filter(group):
-    session['group'] = group
+    session['transaction'].group = group
     return list()
 
+
 @app.route('/filter/between/<string:start>/and/<string:end>')
-def date_filter(start='', end=''):
-    session['from'] = start
-    session['until'] = end
+def date_filter(start, end):
+    ta = g.ta
 
     # Provide parsing to epoch-ts
-    if start and end:
-        def parse_date(str):
-            t = time.strptime(str, '%d._%b_%Y')
-            return time.mktime(t)
+    def parse_date(string):
+        return datetime.datetime.strptime(string, '%d._%b_%Y')
 
-        session['from_ts'] = parse_date(start)
-        session['until_ts'] = parse_date(end)
+    ta.date_start = parse_date(start)
+    ta.date_end = parse_date(end)
 
     # Apply causality
-    if session['from_ts'] > session['until_ts']:
-        session['from_ts'], session['until_ts'] = session['until_ts'], session['from_ts']
-        session['from'], session['until'] = session['until'], session['from']
+    if ta.date_start > ta.date_end:
+        ta.date_start, ta.date_end = ta.date_end, ta.date_start
 
     return list()
 
 
 @app.route('/filter/none')
 def clear_filter():
-    session.pop('from', None)
-    session.pop('from_ts', None)
-    session.pop('until', None)
-    session.pop('until_ts', None)
     session.pop('category', None)
-
+    ta = g.ta
+    ta.date_start = None
+    ta.date_end = None
+    
     #return redirect(url_for('list'))
     return list()
 
 
 @app.route('/item/<id>/lend')
 def item_lend(id):
-    if not 'lend' in session:
-        session['lend'] = {}
-    if not id in session['lend']:
-        session['lend'][id] = 0
-    session['lend'][id] += 1
+    ta = g.ta
+
+    if id in ta.lend:
+        ta.lend[id].amount += 1
+
+    else:
+        it= Item.query.get(id)
+        ta.lend[id] = Lend(it)
+
     flash('%s eingepackt.'%id, 'success')
     return item(id)
     
 
 @app.route('/item/<id>/buy')
 def item_buy(id):
-    if not 'buy' in session:
-        session['buy'] = {}
-    if not id in session['buy']:
-        session['buy'][id] = 0
-    session['buy'][id] += 1
+    ta = g.ta
+
+    if id in ta.buy:
+        ta.buy[id].amount += 1
+
+    else:
+        it= Item.query.get(id)
+        ta.buy[id] = Buy(it)
+
     flash('%s eingepackt.'%id, 'success')
     return item(id)
 
 
 @app.route('/item/<id>/unlend')
 def item_unlend(id):
-    if not 'lend' in session:
-        session['lend'] = {}
-    session['lend'][id] -= 1
-    if session['lend'][id] < 0:
-        session['lend'][id] = 0
+    ta = g.ta
+
+    if not id in ta.lend or ta.lend[id].amount < 1:
+        flash('%s nicht eingepackt', 'error')
+        return item(id)
+
+    ta.lend[id].amount -= 1
     return item(id)
 
 
 @app.route('/item/<id>/unbuy')
 def item_unbuy(id):
-    if not 'buy' in session:
-        session['buy'] = {}
-    session['buy'][id] -= 1
-    if session['buy'][id] < 0:
-        session['buy'][id] = 0
+    ta = g.ta
+
+    if not id in ta.buy or ta.buy[id].amount < 1:
+        flash('%s nicht eingepackt', 'error')
+        return item(id)
+
+    ta.buy[id].amount -= 1
     return item(id)
     
 
 @app.route('/cart/empty')
 def cart_empty():
-    session.pop('buy', None)
-    session.pop('lend', None)
+    ta = g.ta
+    ta.lend = {}
+    ta.buy = {}
+
     return list()
 
 
@@ -199,6 +231,7 @@ def cart_checkout():
     # read and set a cookie for 
     # name, address, email, phone, group
 
+    '''
     lend = session_or_empty('lend')
     buy = session_or_empty('buy')
 
@@ -234,9 +267,20 @@ def cart_checkout():
                 days=days,
                 weeks=weeks
                 )
+    '''
+    ta = g.ta
+
+    if ta.lend and not ta.date_start and not ta.date_end:
+        flash(u'Gib einen Zeitraum für deine Bestellung an ("verfügbar vom…")', 'error')
+        return list()
+
+    return pjax('checkout.html')
+
 
 @app.route('/cart/submit', methods=['POST'])
 def cart_submit():
+    # TODO rewrite!
+    '''
     lend = session_or_empty('lend')
     buy = session_or_empty('buy')
 
@@ -257,16 +301,12 @@ def cart_submit():
     items = Item.query.all()
     items = {i.id: i for i in items}
 
-
-    for id in set(lend.keys()+buy.keys()):
-        l = Itemlist()
-        l.item = items[id]
-        l.buy = buy[id] if id in buy else 0
-        l.lend = lend[id] if id in lend else 0
-        ta.items += l,
+    ta.lend = [Lend(lend[id], items[id]) for id in lend]
+    ta.buy = [Buy(buy[id], items[id]) for id in buy]
 
     db.session.commit()
 
+    '''
     flash(u'Danke für deine Bestellung!')
     return list()
     #return pjax('.html')
@@ -412,8 +452,9 @@ def logout():
 @app.route('/admin')
 @login_required
 def admin():
-    lends = Lend.query.all()
-    return pjax('admin.html', lends=lends)
+    1/0
+    transactions = Transaction.query.all()
+    return pjax('admin.html', transactions=transactions)
 
 
 @app.route('/uploads/<path:filename>')

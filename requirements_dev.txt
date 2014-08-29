@@ -7,6 +7,8 @@ simplejson
 Flask
 SQLAlchemy
 Flask-SQLAlchemy
+Flask-Mail
 unidecode
 pycrypto
 
+flask-debugtoolbar

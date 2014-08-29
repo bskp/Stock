@@ -5,7 +5,12 @@ Sqlite datastore models
 """
 
 from application import db
-from flask import session
+from sqlalchemy.orm.collections import attribute_mapped_collection
+
+from flask import g
+
+import datetime
+
 
 # Enums
 CATEGORIES = ['all', 'outdoor','indoor','vehicle','merchandise', 'machines']
@@ -16,6 +21,7 @@ related = db.Table('related',
     db.Column('item_id', db.String(), db.ForeignKey('item.id')),
     db.Column('related_item_id', db.String(), db.ForeignKey('item.id')),
 )
+
 
 class Item(db.Model):
     '''An item that can be bought or borrowed'''
@@ -50,19 +56,17 @@ class Item(db.Model):
 
 
     def buying(self):
-        if not 'buy' in session:
+        ta = g.ta
+        if not self.id in ta.buy:
             return 0
-        if not self.id in session['buy']:
-            return 0
-        return session['buy'][self.id]
+        return ta.buy[self.id].amount
 
 
     def lending(self):
-        if not 'lend' in session:
+        ta = g.ta
+        if not self.id in ta.buy:
             return 0
-        if not self.id in session['lend']:
-            return 0
-        return session['lend'][self.id]
+        return ta.lend[self.id].amount
 
 
     def available(self):
@@ -74,17 +78,13 @@ class Item(db.Model):
 
 
     def price_lend_w(self):
-        group = 'int'
-        if 'group' in session:
-            group = session['group']
-        return getattr(self, 'lend_w_'+group)
+        ta = g.ta
+        return getattr(self, 'lend_w_'+ta.group)
 
 
     def price_lend_d(self):
-        group = 'int'
-        if 'group' in session:
-            group = session['group']
-        return getattr(self, 'lend_d_'+group)
+        ta = g.ta
+        return getattr(self, 'lend_d_'+ta.group)
 
 
     def price_lend(self, days):
@@ -105,37 +105,54 @@ class Item(db.Model):
 
 
     def tax_per_day(self):
-        group = 'int'
-        if 'group' in session:
-            group= session['group']
-        return getattr(self, 'lend_d_'+group) is not None
+        ta = g.ta
+        return getattr(self, 'lend_d_'+ta.group) is not None
 
 
     def lendable(self):
         return self.price_lend_w() is not None
 
 
-'''
-lendlist = db.Table('lendlist',
-    db.Column('item_id', db.String(), db.ForeignKey('item.id')),
-    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id')),
-)
-
-buylist = db.Table('buylist',
-    db.Column('item_id', db.String(), db.ForeignKey('item.id')),
-    db.Column('transaction_id', db.Integer, db.ForeignKey('transaction.id')),
-)
-'''
-
-
-class Itemlist(db.Model):
+class Buy(db.Model):
     ta_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), primary_key=True)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
 
-    buy = db.Column(db.Integer, default=0)
-    lend = db.Column(db.Integer, default=0)
+    amount = db.Column(db.Integer)
+    item = db.relationship('Item', backref='bought')
+    #cost = db.Column(db.Float)
 
-    item = db.relationship("Item")
+    def cost(self):
+        #TODO respect cost-column
+        return self.amount*self.item.price_buy
+
+    def __init__(self, item):
+        self.item=item
+        self.amount=1
+
+    def __repr__(self):
+        return '<%u %s>' % (self.amount, self.item.id)
+    
+
+class Lend(db.Model):
+    ta_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
+
+    amount = db.Column(db.Integer)
+    item = db.relationship('Item', backref='lent')
+    #cost = db.Column(db.Float)
+
+
+    def cost(self, days):
+        #TODO respect cost-column
+        return self.amount*self.item.price_lend(days)
+
+
+    def __init__(self, item):
+        self.item=item
+        self.amount=1
+
+    def __repr__(self):
+        return '<%u %s>' % (self.amount, self.item.id)
 
 
 class Transaction(db.Model):
@@ -151,18 +168,36 @@ class Transaction(db.Model):
 
     progress = db.Column(db.Enum(*PROGRESS), default='new')
 
-    items = db.relationship("Itemlist")
-
-    '''
-    lend = db.relationship('Item', secondary=lendlist,
-            backref=db.backref('lent', lazy='dynamic'))
-    buy  = db.relationship('Item', secondary=buylist,
-            backref=db.backref('bought', lazy='dynamic'))
-    '''
+    buy = db.relationship('Buy', backref='transaction', collection_class=attribute_mapped_collection('item_id'),)
+    lend = db.relationship('Lend', backref='transaction', collection_class=attribute_mapped_collection('item_id'),)
 
     date_start = db.Column(db.Date)
     date_end = db.Column(db.Date)
     date = db.Column(db.DateTime)
+
+    
+    def days(self):
+        return (self.date_end-self.date_start).days
+        
+
+    def weeks(self):
+        from math import ceil
+        return int(ceil(self.days()/7.0))
+
+
+    def n_in_cart(self):
+        return len(self.buy) + len(self.lend)
+
+
+    def cost(self):
+        lends = [il.cost() for il in self.lend.values()]
+        buys = [il.cost() for il in self.buy.values()]
+        return sum(lends) + sum(buys)
+
+
+    def __init__(self):
+        self.group = 'int'
+        self.date = datetime.datetime.utcnow()
 
 
     def __repr__(self):

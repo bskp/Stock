@@ -1,5 +1,3 @@
-{%- import "snippets.html" as snippets with context %}
-
 <aside id="sidebar">
 {% block sidebar %}
 {% endblock %}
@@ -59,10 +57,10 @@
 {% endblock %}
 {% endif %}
 
-{% if n_in_cart > 0 %}
+{% if ta.n_in_cart() > 0 %}
 {% block cart %}
 <aside id="cart">
-    {{ n_in_cart }}×<i class="icon-shopping-cart"></i>
+    {{ ta.n_in_cart() }}×<i class="icon-shopping-cart"></i>
     <a href="{{ url_for('cart_empty') }}">Leeren</a>
     <a href="{{ url_for('cart_checkout') }}" style="float: right;">Bestellen</a>
 </aside>

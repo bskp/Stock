@@ -24,6 +24,7 @@
 	<body>
         <header>
             <a href="{{ url_for('list') }}"><h1>RAST-Spielmaterialverleih</h1></a>
+            {% block header%}
             <a class="reset" data-target="#search" style="float:right;"><i class="icon-remove-sign"></i></a>
             <input id="search" style="float:right;" type="text" placeholder="Suche"/>
 
@@ -37,16 +38,17 @@
             </select></span>
             für 
             <span class="select"><select name="group" id="list_group">
-                <option {{ group|option('int') }}>Jubla-Scharen</option>
-                <option {{ group|option('edu') }}>Schulen</option>
-                <option {{ group|option('ext') }}>Externe</option>
+                <option {{ ta.group|option('int') }}>Jubla-Scharen</option>
+                <option {{ ta.group|option('edu') }}>Schulen</option>
+                <option {{ ta.group|option('ext') }}>Externe</option>
             </select></span>
             verfügbar vom
-            <input type="text" class="datepicker" value="{{ date_from|replace('_', ' ') }}" name="from" id="from">
+            <input type="text" class="datepicker" value="{{ ta.date_start|date }}" name="from" id="from">
             bis
-            <input type="text" class="datepicker" value="{{ date_until|replace('_', ' ') }}" name="until" id="until">
+            <input type="text" class="datepicker" value="{{ ta.date_end|date }}" name="until" id="until">
 
             <a class="reset" data-target=".datepicker,#list_category" data-url="/filter/none"><i class="icon-remove-sign"></i></a>
+            {% endblock %}
         </header>
         <div id="target">{% include template %}</div>
 	</body>

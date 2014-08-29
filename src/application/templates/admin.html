@@ -1,0 +1,55 @@
+{% extends "content.html" %}
+
+{% block content %}
+
+<table>
+    <tr class="head"><td>Kauf</td><td>Preis</td><td>Stück</td></tr>
+    {% for ta in transactions %}
+    <tr>
+        <td>{{ ta.name }}</td>
+        <td>{{ ta.date|date }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <table>
+        {% if ta.lend %}
+        <tr class="head"><td>Miete</td><td>Tarif</td><td>Stück</td><td>Dauer</td></tr>
+        {{ ta.weeks() }} Wochen / {{ ta.days() }} Tage
+        {% for il in ta.lend %}
+        <tr>
+            <td>{{ il.item.name }}</td><td>{{ il.item.price_lend_d()|cash }}</td>
+            <td>× {{ il.amount }}</td><td>× {% if il.item.price_lend_w() %}{{ta.days()}}{% else %}{{ta.weeks()}}{% endif %}</td>
+            <td>{{ (il.amount*il.item.price_lend(ta.days()))|cash }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if ta.buy %}
+        <tr class="head"><td>Kauf</td><td>Preis</td><td>Stück</td></tr>
+        {% for il in ta.buy %}
+        <tr>
+            <td>{{ il.item.name }}</td>
+            <td>{{ il.item.price_buy|cash }}</td>
+            <td>× {{ il.amount }}</td>
+            <td></td>
+            <td>{{ (il.amount*il.item.price_buy)|cash }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        <tr><td>Total<td></td></td><td></td><td></td><td></td></tr>
+    </table>
+
+    {% endfor %}
+</table>
+
+{% endblock %}
+
+{% block admin %}
+<div id="admin">
+    <span>CHEF-MODUS</span>
+    <a href="{{ url_for('logout') }}"><i class="icon-eject"></i></a>
+    <a href="{{ url_for('admin') }}"><i class="icon-tasks"></i></a>
+</div>
+{% endblock %}
