@@ -24,20 +24,25 @@ related = db.Table('related',
 
 
 class Item(db.Model):
-    '''An item that can be bought or borrowed'''
+    ''' An item that can be bought or borrowed
+        Some methods require the request-context.
+        TODO: Proper context validation with exceptions et al.'''
+
     id = db.Column(db.String(), primary_key=True)
     name = db.Column(db.Unicode(), unique=True)
     description = db.Column(db.UnicodeText)
     count = db.Column(db.Integer, default=1)
     # The corresponding image is saved saved under uploads/<entity.id>.jpg
 
-    lend_w_int = db.Column(db.Float)
-    lend_w_edu = db.Column(db.Float)
-    lend_w_ext = db.Column(db.Float)
+    tax_base_int = db.Column(db.Float, default=0)
+    tax_base_edu = db.Column(db.Float, default=0)
+    tax_base_ext = db.Column(db.Float, default=0)
 
-    lend_d_int = db.Column(db.Float)
-    lend_d_edu = db.Column(db.Float)
-    lend_d_ext = db.Column(db.Float)
+    tax_int = db.Column(db.Float)
+    tax_edu = db.Column(db.Float)
+    tax_ext = db.Column(db.Float)
+
+    tax_period = db.Column(db.Enum('week', 'day'), default='week')
     
     price_buy = db.Column(db.Float)
 
@@ -51,10 +56,15 @@ class Item(db.Model):
         return u"<Item %s>" % (self.id)
 
 
+    @property
     def in_stock(self):
+        ''' Returns the amount of this item in stock during the selected time-
+            span. 
+        '''
         return self.count - 0#TODO amount lent during session timespan
 
 
+    @property
     def buying(self):
         ta = g.ta
         if not self.id in ta.buy:
@@ -62,55 +72,50 @@ class Item(db.Model):
         return ta.buy[self.id].amount
 
 
+    @property
     def lending(self):
         ta = g.ta
-        if not self.id in ta.buy:
+        if not self.id in ta.lend:
             return 0
         return ta.lend[self.id].amount
 
 
+    @property
     def available(self):
-        return self.in_stock() - self.buying() - self.lending()
+        return self.in_stock - self.buying - self.lending
 
 
+    @property
+    def lendable(self):
+        return self.tax is not None
+
+
+    @property
     def buyable(self):
         return self.price_buy is not None
 
 
-    def price_lend_w(self):
+    @property
+    def tax_base(self):
         ta = g.ta
-        return getattr(self, 'lend_w_'+ta.group)
+        return getattr(self, 'tax_base_'+ta.group)
 
 
-    def price_lend_d(self):
+    @property
+    def tax(self):
         ta = g.ta
-        return getattr(self, 'lend_d_'+ta.group)
+        return getattr(self, 'tax_'+ta.group)
 
 
-    def price_lend(self, days):
+    def tax_total(self, days):
         from math import ceil
+        if self.tax_period == 'week':
+            periods = int(ceil(days/7.0))
+        else:
+            periods = days
 
-        d = self.price_lend_d()
-        w = self.price_lend_w()
-        n = 7  # days of second tax-value
+        return self.tax_base + periods*self.tax
 
-        if d is None:
-            # Simple taxing
-            weeks = int(ceil(days/7.0))
-            return weeks*self.price_lend_w()
-
-        # Day-based taxing
-        price = (w-d)/(n-1) * (days-1) + d
-        return ceil(price)
-
-
-    def tax_per_day(self):
-        ta = g.ta
-        return getattr(self, 'lend_d_'+ta.group) is not None
-
-
-    def lendable(self):
-        return self.price_lend_w() is not None
 
 
 class Buy(db.Model):
@@ -119,19 +124,21 @@ class Buy(db.Model):
 
     amount = db.Column(db.Integer)
     item = db.relationship('Item', backref='bought')
-    #cost = db.Column(db.Float)
+    cost = db.Column(db.Float)  # Possibility to override the cost
+
 
     def cost(self):
         #TODO respect cost-column
         return self.amount*self.item.price_buy
 
-    def __init__(self, item):
+    def __init__(self, item, amount=1):
         self.item=item
-        self.amount=1
+        self.amount=amount
 
     def __repr__(self):
-        return '<%u %s>' % (self.amount, self.item.id)
+        return '<%ux %s>' % (self.amount, self.item.id)
     
+
 
 class Lend(db.Model):
     ta_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), primary_key=True)
@@ -139,20 +146,21 @@ class Lend(db.Model):
 
     amount = db.Column(db.Integer)
     item = db.relationship('Item', backref='lent')
-    #cost = db.Column(db.Float)
+    cost = db.Column(db.Float)
 
 
     def cost(self, days):
         #TODO respect cost-column
-        return self.amount*self.item.price_lend(days)
+        return self.amount*self.item.tax_total(days)
 
 
-    def __init__(self, item):
+    def __init__(self, item, amount=1):
         self.item=item
-        self.amount=1
+        self.amount=amount
 
     def __repr__(self):
-        return '<%u %s>' % (self.amount, self.item.id)
+        return '<%ux %s>' % (self.amount, self.item.id)
+
 
 
 class Transaction(db.Model):
@@ -161,7 +169,7 @@ class Transaction(db.Model):
     name = db.Column(db.Unicode())
     email = db.Column(db.Unicode())
     tel = db.Column(db.Unicode())
-    group = db.Column(db.Unicode())
+    group = db.Column(db.Enum('int', 'edu', 'ext'))
     payment = db.Column(db.Unicode())
     delivery = db.Column(db.Unicode()) # Address
     remarks = db.Column(db.UnicodeText())
@@ -176,21 +184,29 @@ class Transaction(db.Model):
     date = db.Column(db.DateTime)
 
     
+    @property
     def days(self):
         return (self.date_end-self.date_start).days
         
 
+    @property
     def weeks(self):
         from math import ceil
-        return int(ceil(self.days()/7.0))
+        return int(ceil(self.days/7.0))
 
 
+    @property
     def n_in_cart(self):
-        return len(self.buy) + len(self.lend)
+
+        lend = [item.amount for item in self.lend.values()]
+        buy = [item.amount for item in self.buy.values()]
+
+        return sum(lend) + sum(buy)
 
 
+    @property
     def cost(self):
-        lends = [il.cost() for il in self.lend.values()]
+        lends = [il.cost(self.days) for il in self.lend.values()]
         buys = [il.cost() for il in self.buy.values()]
         return sum(lends) + sum(buys)
 

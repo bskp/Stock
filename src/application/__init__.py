@@ -18,6 +18,7 @@ locale.setlocale(locale.LC_ALL, app.config['LOCALE'])
 # Enable jinja2 loop controls extension
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
+
 # jinja custom filter for pretty cash-amounts
 def jinja_cash(amount):
     if not amount:
@@ -32,7 +33,7 @@ app.jinja_env.filters['cash'] = jinja_cash
 
 
 def jinja_date(dt_obj):
-    if dt_obj is None:
+    if dt_obj is None or dt_obj == []:
         return ''
     return dt_obj.strftime(u'%d. %b %Y')
 app.jinja_env.filters['date'] = jinja_date

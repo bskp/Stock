@@ -11,37 +11,39 @@
     <img src="/uploads/full/{{ item.id }}.jpg" />
 
     <p id="description">{{item.description}}</p>
-    {% if item.lendable() -%}
+    {% if item.lendable -%}
         Miete:
-        {% if item.price_lend_d() %}
-        <strong>{{ item.price_lend_d()|cash }}</strong> / Tag, 
+        {% if item.tax_base %}
+        <strong>{{ item.tax_base|cash }}</strong> + 
         {% endif %}
-        <strong>{{ item.price_lend_w()|cash }}</strong> / Woche<br />
+        <strong>{{ item.tax|cash }}</strong> pro {% if item.tax_period == 'week' %}Woche{% else %}Tag{% endif %}<br />
     {% endif %}
-    {% if item.buyable() %}
+
+    {% if item.buyable %}
         Kauf: <strong>{{ item.price_buy|cash }}</strong> / Stück<br />
     {% endif %}
         
-    {% if item.lendable() %}
-        {% if item.available() %}
-            <a class="btn" href="{{ url_for('item_lend', id=item.id) }}">Ausleihen</a>
+    {% if item.lendable %}
+        {% if item.available %}
+            <a class="btn" href="{{ url_for('item_lend', id=item.id) }}">Ausleihen
+            </a>
         {% else %}
             <span class="btn">Ausleihen</span>
         {% endif %}
 
-        {% if item.lending() %}
+        {% if item.lending %}
             <a href="{{ url_for('item_unlend', id=item.id) }}" title="zurücklegen"><i class="icon-undo inset"></i></a>
         {% endif %}
     {% endif %}
 
-    {% if item.buyable() %}
-        {% if item.available() %}
+    {% if item.buyable %}
+        {% if item.available %}
             <a class="btn buy" href="{{ url_for('item_buy', id=item.id) }}">Kaufen</a>
         {% else %}
             <span class="btn">Kaufen</span>
         {% endif %}
 
-        {% if item.buying() %}
+        {% if item.buying %}
             <a href="{{ url_for('item_unbuy', id=item.id) }}" title="zurücklegen"><i class="icon-undo inset"></i></a>
         {% endif %}
     {% endif %}

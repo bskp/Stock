@@ -19,19 +19,38 @@
 
     <label>Exemplare: <input name="count" value="{{item.count}}" style="width: 2em;"/>× </label>
 
-    <h2>Miete pro Woche</h2>
-    <label>Fr. <input name="lend_w_int" value="{{item.lend_w_int|float('')}}" placeholder="nicht vermietbar an" />Jubla-Scharen</label>
-    <label>Fr. <input name="lend_w_edu" value="{{item.lend_w_edu|float('')}}" placeholder="nicht vermietbar an" />Schulen</label>
-    <label>Fr. <input name="lend_w_ext" value="{{item.lend_w_ext|float('')}}" placeholder="nicht vermietbar an" />Externe</label>
+    <table>
+        <tr class="head">
+            <td>Basis</td>
+            <td>Pro <span class="select"><select name="tax_period">
+                        <option {{ item.tax_period|option('week') }}>Woche</option>
+                        <option {{ item.tax_period|option('day') }}>Tag</option>
+                </select></span>
+            </td>
+            <td>Gruppe</td>
+        </tr>
 
-    <h2>Miete pro Tag</h2>
-    <label>Fr. <input name="lend_d_int" value="{{item.lend_d_int|float('')}}" placeholder="pro Woche abrechnen" />Jubla-Scharen</label>
-    <label>Fr. <input name="lend_d_edu" value="{{item.lend_d_edu|float('')}}" placeholder="pro Woche abrechnen" />Schulen</label>
-    <label>Fr. <input name="lend_d_ext" value="{{item.lend_d_ext|float('')}}" placeholder="pro Woche abrechnen" />Externe</label>
+        <tr>
+            <td>Fr. <input class="short" name="tax_base_int" value="{{item.tax_base_int|float('')}}" placeholder="0"/></td>
+            <td>+<input name="tax_int" value="{{item.tax_int|float('')}}" placeholder="nicht vermietbar an" /></td>
+            <td>Jubla-Scharen</td>
+        </tr>
+        <tr>
+            <td>Fr. <input class="short" name="tax_base_edu" value="{{item.tax_base_edu|float('')}}" placeholder="0"/></td>
+            <td>+<input name="tax_edu" value="{{item.tax_edu|float('')}}" placeholder="nicht vermietbar an" /></td>
+            <td>Schulen</td>
+        </tr>
+        <tr>
+            <td>Fr. <input class="short" name="tax_base_ext" value="{{item.tax_base_ext|float('')}}" placeholder="0"/></td>
+            <td>+<input name="tax_ext" value="{{item.tax_ext|float('')}}" placeholder="nicht vermietbar an" /></td>
+            <td>Externe</td>
+        </tr>
+    </table>
 
     <h2>Kauf</h2>
     <label>Fr. <input name="price_buy" value="{{item.price_buy|float('')}}" placeholder="unverkäuflich" /></label>
 
+    <h2>Foto</h2>
     <input name="image" type="file" accept="image/*" placeholder="Bild auswählen"/>
     <br />
 

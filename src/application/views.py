@@ -18,50 +18,44 @@ import datetime
 import uuid
 
 
-'''
-def cleanup_g():
-    '' Deletes old transaction instances in g ''
+def session_or_empty(key):
+    if key in session:
+        return session[key]
+    return []
 
-    if not 'transactions' in g:
-        return
-
-    now = datetime.datetime.utcnow()
-    for tr_hash in g.transactions:
-        ta = g.transactions[tr_hash]
-        print '%s: %s' % (tr_hash, now-ta.date)
-
-        if (now-ta.date).days > 3:
-            g.transactions.pop(tr_hash)
-'''
 
 @app.before_request
-def fetch_transaction():
-    from flask import session
+def create_transaction():
+    ta = Transaction()
 
-    if not 'tr_hash' in session \
-    or not hasattr(app, 'transactions') \
-    or not session['tr_hash'] in app.transactions:
-        tr_hash = uuid.uuid4()
-        session['tr_hash'] = tr_hash
+    lending = session_or_empty('lend')
+    buying = session_or_empty('buy')
 
-        if not hasattr(app, 'transactions'):
-            app.transactions = {}
+    for id in lending:
+        item = Item.query.get(id)
+        ta.lend[id] = Lend(item, lending[id])
 
-        app.transactions[tr_hash] = Transaction()
-        print 'Added transaction hash %s' % tr_hash
-        flash(u'New transaction', 'notice')
-    else:
-        print 'Fetched transaction %s' % session['tr_hash']
+    for id in buying:
+        item = Item.query.get(id)
+        ta.buy[id] = Buy(item, buying[id])
 
-    g.ta = app.transactions[session['tr_hash']]
+    ta.date_start = session_or_empty('date_start')
+    ta.date_end = session_or_empty('date_end')
 
-    from pprint import pprint
-    pprint(g.ta.lend)
-    pprint(g.ta.buy)
+    g.ta = ta
 
-def available_between(item):
-    # TODO filter out unavailable items
-    return True
+
+@app.after_request
+def dump_transaction(response):
+    ta = g.ta
+
+    session['lend'] = {id: ta.lend[id].amount for id in ta.lend}
+    session['buy'] = {id: ta.buy[id].amount for id in ta.buy}
+
+    session['date_start'] = ta.date_start
+    session['date_end'] = ta.date_end
+
+    return response
 
 
 def pjax(template, **kwargs):
@@ -77,13 +71,14 @@ def pjax(template, **kwargs):
 
     ta = g.ta
 
-    if ta.group:
-        items = filter(lambda i: i.buyable() or i.lendable(), items)
+    if ta.group and not 'logged_in' in session:
+        items = filter(lambda i: i.buyable or i.lendable, items)
 
     if ta.date_start and ta.date_end:
-        items = filter(available_between, items)
+        #items = filter(Item.in_stock, items)
+        pass
 
-    kwargs['logged_in'] = hasattr(session, 'logged_in')
+    kwargs['logged_in'] = 'logged_in' in session
 
     if "X-PJAX" in request.headers:
         return render_template(template, items=items, ta=ta, **kwargs)
@@ -98,7 +93,7 @@ def pjax(template, **kwargs):
 
 
 def login_required(f):
-    ''' Wrapper for protected views. '''
+    ''' Decorator for protected views. '''
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not 'logged_in' in session:
@@ -110,9 +105,6 @@ def login_required(f):
 
 @app.route('/')
 def list():
-    ''' Generic listing function, called by every other pre-filtering
-    listers (see below).'''
-
     return pjax('content.html')
 
 
@@ -129,7 +121,7 @@ def cat_filter(category):
 
 @app.route('/filter/group/<string:group>')
 def group_filter(group):
-    session['transaction'].group = group
+    g.ta.group= group
     return list()
 
 
@@ -144,7 +136,7 @@ def date_filter(start, end):
     ta.date_start = parse_date(start)
     ta.date_end = parse_date(end)
 
-    # Apply causality
+    # Enforce date order
     if ta.date_start > ta.date_end:
         ta.date_start, ta.date_end = ta.date_end, ta.date_start
 
@@ -197,10 +189,13 @@ def item_unlend(id):
     ta = g.ta
 
     if not id in ta.lend or ta.lend[id].amount < 1:
-        flash('%s nicht eingepackt', 'error')
+        flash('%s nicht eingepackt'%id, 'error')
         return item(id)
 
     ta.lend[id].amount -= 1
+
+    if ta.lend[id].amount == 0:
+        ta.lend.pop(id)
     return item(id)
 
 
@@ -209,18 +204,20 @@ def item_unbuy(id):
     ta = g.ta
 
     if not id in ta.buy or ta.buy[id].amount < 1:
-        flash('%s nicht eingepackt', 'error')
+        flash('%s nicht eingepackt'%id, 'error')
         return item(id)
 
     ta.buy[id].amount -= 1
+
+    if ta.buy[id].amount == 0:
+        ta.buy.pop(id)
     return item(id)
     
 
 @app.route('/cart/empty')
 def cart_empty():
-    ta = g.ta
-    ta.lend = {}
-    ta.buy = {}
+    g.ta.lend.clear()
+    g.ta.buy.clear()
 
     return list()
 
@@ -279,14 +276,8 @@ def cart_checkout():
 
 @app.route('/cart/submit', methods=['POST'])
 def cart_submit():
-    # TODO rewrite!
-    '''
-    lend = session_or_empty('lend')
-    buy = session_or_empty('buy')
+    ta = g.ta
 
-    ta = Transaction()
-    db.session.add(ta)
-    
     ta.name = request.form.get('name')
     ta.email = request.form.get('email')
     ta.tel = request.form.get('tel')
@@ -294,22 +285,11 @@ def cart_submit():
     ta.delivery = request.form.get('delivery')
     ta.remarks = request.form.get('remarks')
 
-    ta.date_start = datetime.date.fromtimestamp(session['from_ts'])
-    ta.date_end = datetime.date.fromtimestamp(session['until_ts'])
-    ta.date = datetime.datetime.now()
-
-    items = Item.query.all()
-    items = {i.id: i for i in items}
-
-    ta.lend = [Lend(lend[id], items[id]) for id in lend]
-    ta.buy = [Buy(buy[id], items[id]) for id in buy]
-
+    db.session.add(ta)
     db.session.commit()
 
-    '''
     flash(u'Danke für deine Bestellung!')
     return list()
-    #return pjax('.html')
     
 
 
@@ -342,6 +322,7 @@ def item_edit(id=None):
         item = Item.query.get_or_404(id)
     else:
         item = Item()
+        # The following attributes are needed to show this dummy-item
         item.count = 1
         item.name = ''
 
@@ -364,15 +345,18 @@ def item_post(id=None):
     item.description = request.form.get('description')
     item.count = int(request.form.get('count')) if request.form.get('count') else 1
 
-    item.lend_w_int = float(request.form.get('lend_w_int')) if request.form.get('lend_w_int') else None
-    item.lend_w_edu = float(request.form.get('lend_w_edu')) if request.form.get('lend_w_edu') else None
-    item.lend_w_ext = float(request.form.get('lend_w_ext')) if request.form.get('lend_w_ext') else None
+    request_or_none = lambda key: float(request.form.get(key)) if request.form.get(key) else None
 
-    item.lend_d_int = float(request.form.get('lend_d_int')) if request.form.get('lend_d_int') else None
-    item.lend_d_edu = float(request.form.get('lend_d_edu')) if request.form.get('lend_d_edu') else None
-    item.lend_d_ext = float(request.form.get('lend_d_ext')) if request.form.get('lend_d_ext') else None
+    item.tax_base_int = request_or_none('tax_base_int')
+    item.tax_base_edu = request_or_none('tax_base_edu')
+    item.tax_base_ext = request_or_none('tax_base_ext')
+    item.tax_int = request_or_none('tax_int')
+    item.tax_edu = request_or_none('tax_edu')
+    item.tax_ext = request_or_none('tax_ext')
 
-    item.price_buy = float(request.form.get('price_buy')) if request.form.get('price_buy') else None
+    item.tax_period = request.form.get('tax_period')
+
+    item.price_buy = request_or_none('price_buy')
 
     item.category = request.form.get('category')
 

@@ -1811,6 +1811,11 @@ select:-ms-input-placeholder {
   width: 302px;
   padding-left: 1px;
 }
+textarea.short,
+input.short,
+select.short {
+  width: 3em;
+}
 .fill {
   clear: right;
 }
@@ -1931,26 +1936,10 @@ ul.items li a span {
   padding: 0.5em 0;
 }
 ul.items li a sup {
-  font-size: 28px;
-  line-height: 1em;
-  display: inline-block;
-  color: white;
-  background-color: #00a7db;
-  -webkit-border-radius: 50px;
-  -moz-border-radius: 50px;
-  border-radius: 50px;
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding;
-  background-clip: padding-box;
-  padding: 0 0.3em 0.15em 0.3em;
   position: relative;
   left: 40px;
   top: 10px;
-  border: 2px solid #ffffff;
   margin: 0 -0.25em;
-}
-ul.items li a sup.buy {
-  background-color: #f57308;
 }
 ul.items li.selected a {
   -webkit-transform: rotate(8deg);
@@ -1962,12 +1951,27 @@ ul.items li.selected a {
 ul.items li a.hidden {
   opacity: 0.2;
 }
+sup {
+  font-size: 28px;
+  line-height: 1em;
+  display: inline-block;
+  color: #ffffff;
+  background-color: #00a7db;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  border-radius: 50px;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  padding: 0 0.3em 0.15em 0.3em;
+  border: 2px solid #ffffff;
+  margin: -1em -0.25em;
+}
+sup.buy {
+  background-color: #f57308;
+}
 #sidebar table {
   width: 100%;
-}
-#sidebar table tr:last-child td:last-child {
-  border-top: 1px solid #000000;
-  font-weight: bold;
 }
 #sidebar table tr.head {
   font-weight: bold;
@@ -1976,10 +1980,14 @@ ul.items li a.hidden {
 #sidebar table tr.head td {
   padding-top: 1em;
 }
-#sidebar table td {
+#sidebar table.receipt tr:last-child td:last-child {
+  border-top: 1px solid #000000;
+  font-weight: bold;
+}
+#sidebar table.receipt td {
   text-align: right;
 }
-#sidebar table td:first-child {
+#sidebar table.receipt td:first-child {
   text-align: left;
 }
 .Zebra_DatePicker *,

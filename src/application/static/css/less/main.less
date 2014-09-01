@@ -191,6 +191,10 @@ textarea, input, select{
         padding-left: 1px;
     }
 
+    &.short{
+        width: 3em;
+    }
+
 }
 
 .fill{
@@ -333,22 +337,10 @@ ul.items{
             }
 
             sup {
-                font-size: 28px;
-                line-height: 1em;
-                display: inline-block;
-                position:relative;
-
-                color: white;
-                background-color: @accent;
-                .border-radius(50px);
-                padding: 0 0.3em 0.15em 0.3em;
                 position: relative;
                 left: 40px;
                 top: 10px;
-                border: 2px solid  @white;
                 margin: 0 -0.25em;
-
-                &.buy{ background-color: @alt; }
             }
 
         } // a
@@ -364,13 +356,25 @@ ul.items{
     } // li
 } // ul.items
 
+
+sup {
+    font-size: 28px;
+    line-height: 1em;
+    display: inline-block;
+
+    color: @white;
+    background-color: @accent;
+    .border-radius(50px);
+    padding: 0 0.3em 0.15em 0.3em;
+    border: 2px solid  @white;
+    margin: -1em -0.25em;
+
+    &.buy{ background-color: @alt; }
+}
+
+
 #sidebar table{
     width: 100%;
-
-    tr:last-child td:last-child{
-        border-top: 1px solid @black;
-        font-weight: bold;
-    }
 
     tr.head{
         font-weight: bold;
@@ -381,13 +385,18 @@ ul.items{
         }
     }
 
+    &.receipt{
+        tr:last-child td:last-child{
+            border-top: 1px solid @black;
+            font-weight: bold;
+        }
+        td{
+            text-align: right;
+        }
 
-    td{
-        text-align: right;
-    }
-
-    td:first-child{
-        text-align: left;
+        td:first-child{
+            text-align: left;
+        }
     }
 }
 
