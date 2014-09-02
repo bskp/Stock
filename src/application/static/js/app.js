@@ -30,10 +30,6 @@ $(function() {
         $('#until.datepicker').Zebra_DatePicker(config);
     })
         
-    // Configure read-only date picker
-    //config.always_visible = $('#calendar_');
-    //config.onSelect = null;
-
     $(document).on('pjax:end', function() {
         $('#search').trigger('change');
     })

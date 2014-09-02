@@ -1599,15 +1599,16 @@ header select:-ms-input-placeholder {
   padding: 0 1em;
 }
 #sidebar {
+  width: 423px;
   float: right;
   background-color: #ffffff;
   min-height: 100%;
   padding: 1em;
   padding-top: 0.5em;
+  padding-bottom: 50px;
   border-left: solid 1px rgba(0, 0, 0, 0.1);
 }
 #sidebar h1 {
-  width: 423px;
   margin-top: 0;
 }
 #sidebar h2 {
@@ -1624,6 +1625,14 @@ header select:-ms-input-placeholder {
 }
 #sidebar img {
   max-width: 423px;
+}
+#sidebar .navi {
+  float: right;
+  margin-top: 0.5em;
+}
+#sidebar .navi:hover {
+  text-decoration: none;
+  color: #00a7db;
 }
 #flash {
   position: fixed;
@@ -1769,6 +1778,12 @@ select {
   letter-spacing: inherit;
   word-spacing: inherit;
   color: inherit;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
   background-color: #dddddd;
 }
 textarea::-webkit-input-placeholder,
@@ -1841,6 +1856,40 @@ input.datepicker {
   text-align: center;
   cursor: pointer;
 }
+table.calendar {
+  width: auto;
+  float: left;
+  text-align: center;
+  margin-right: 2em;
+  margin-top: 1em;
+}
+table.calendar td.out {
+  color: #f57308;
+  position: relative;
+}
+table.calendar td.out:before {
+  position: absolute;
+  content: "";
+  left: 0;
+  top: 50%;
+  right: 0;
+  border-top: 1px solid;
+  border-color: inherit;
+  -webkit-transform: rotate(40deg);
+  -moz-transform: rotate(40deg);
+  -ms-transform: rotate(40deg);
+  -o-transform: rotate(40deg);
+  transform: rotate(40deg);
+}
+table.calendar td.blur {
+  color: #dddddd;
+}
+table.calendar td.today {
+  color: #00a7db;
+}
+table.calendar td {
+  padding-right: 2px;
+}
 a i {
   cursor: pointer;
 }
@@ -1876,12 +1925,6 @@ i.inset {
   margin-left: -1.6em;
   margin-right: 0.45em;
   font-size: 20px;
-}
-#calendar {
-  display: none;
-}
-#calendar_ {
-  height: 240px;
 }
 ul.items {
   padding: 0;
@@ -1970,24 +2013,27 @@ sup {
 sup.buy {
   background-color: #f57308;
 }
-#sidebar table {
+table {
   width: 100%;
 }
-#sidebar table tr.head {
+#content table {
+  width: 60%;
+}
+table tr.head {
   font-weight: bold;
   text-transform: uppercase;
 }
-#sidebar table tr.head td {
+table tr.head td {
   padding-top: 1em;
 }
-#sidebar table.receipt tr:last-child td:last-child {
+table.receipt tr:last-child td:last-child {
   border-top: 1px solid #000000;
   font-weight: bold;
 }
-#sidebar table.receipt td {
+table.receipt td {
   text-align: right;
 }
-#sidebar table.receipt td:first-child {
+table.receipt td:first-child {
   text-align: left;
 }
 .Zebra_DatePicker *,

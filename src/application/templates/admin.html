@@ -3,43 +3,26 @@
 {% block content %}
 
 <table>
-    <tr class="head"><td>Kauf</td><td>Preis</td><td>Stück</td></tr>
-    {% for ta in transactions %}
-    <tr>
-        <td>{{ ta.name }}</td>
-        <td>{{ ta.date|date }}</td>
-        <td></td>
-        <td></td>
-        <td></td>
+    <tr class="head">
+        <td>Status</td>
+        <td>Datum</td>
+        <td>Name</td>
+        <td>Von</td>
+        <td>Bis</td>
+        <td>Kosten</td>
     </tr>
 
-    <table>
-        {% if ta.lend %}
-        <tr class="head"><td>Miete</td><td>Tarif</td><td>Stück</td><td>Dauer</td></tr>
-        {{ ta.weeks() }} Wochen / {{ ta.days() }} Tage
-        {% for il in ta.lend %}
-        <tr>
-            <td>{{ il.item.name }}</td><td>{{ il.item.price_lend_d()|cash }}</td>
-            <td>× {{ il.amount }}</td><td>× {% if il.item.price_lend_w() %}{{ta.days()}}{% else %}{{ta.weeks()}}{% endif %}</td>
-            <td>{{ (il.amount*il.item.price_lend(ta.days()))|cash }}</td>
-        </tr>
-        {% endfor %}
-        {% endif %}
-
-        {% if ta.buy %}
-        <tr class="head"><td>Kauf</td><td>Preis</td><td>Stück</td></tr>
-        {% for il in ta.buy %}
-        <tr>
-            <td>{{ il.item.name }}</td>
-            <td>{{ il.item.price_buy|cash }}</td>
-            <td>× {{ il.amount }}</td>
-            <td></td>
-            <td>{{ (il.amount*il.item.price_buy)|cash }}</td>
-        </tr>
-        {% endfor %}
-        {% endif %}
-        <tr><td>Total<td></td></td><td></td><td></td><td></td></tr>
-    </table>
+    </tr>
+    {% for ta in transactions %}
+    <tr>
+        <td>{{ ta.progress }}</td>
+        <td>{{ ta.date|date }}</td>
+        <td>{{ ta.name }}</td>
+        <td>{{ ta.date_start|date }}</td>
+        <td>{{ ta.date_end|date }}</td>
+        <td>{{ ta.cost|cash }}</td>
+        <td><a href="{{ url_for('admin_transaction', id=ta.id) }}"><i class="icon-chevron-right"></i></a></td>
+    </tr>
 
     {% endfor %}
 </table>

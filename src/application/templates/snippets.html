@@ -19,3 +19,28 @@
     {% endif %}
 </div>
 {%- endmacro %}
+{% macro month(days) -%}
+<table class="calendar">
+    <tr>
+        <td colspan=7>{{ days[15]['month'] }}</td>
+    </tr>
+    <tr class="">
+        <td>Mo</td>
+        <td>Di</td>
+        <td>Mi</td>
+        <td>Do</td>
+        <td>Fr</td>
+        <td>Sa</td>
+        <td>So</td>
+    <tr>
+
+    <tr>
+    {% for day in days %}
+    <td class="{{ day['class'] }}" title="{{ day['title'] }}">{{ day['nr'] }}</td>
+        {% if day['weekday'] == 6 %}
+            </tr><tr>
+        {% endif %}
+    {% endfor %}
+    </tr>
+</table>
+{%- endmacro %}

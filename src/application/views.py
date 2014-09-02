@@ -18,6 +18,35 @@ import datetime
 import uuid
 
 
+def calendar(month_offset=0):
+    today = datetime.date.today()
+    month = today.month-1 + month_offset
+    year = today.year + month/12
+    month = month % 12 +1
+    day1 = datetime.date(year, month, 1)  # 1. of current month
+    day1 = day1 - datetime.timedelta(7)  # Go back a week
+    while day1.weekday():  # Monday -> 0
+        day1 = day1 + datetime.timedelta(1)
+    
+    days = []
+    for dt in range(7*6):  # Generate days for six weeks
+        d = day1 + datetime.timedelta(dt)
+        day = {}
+        import random
+        in_stock = random.randint(0,2)
+
+        day['weekday'] = d.weekday()
+        day['nr'] = d.day
+        day['month'] = d.strftime(u'%B %Y'.encode('utf-8')).decode('utf-8')
+        day['title'] = u'%u Stück' % in_stock
+        day['class'] = 'blur' if not d.month == month else ''
+        day['class'] += ' today' if d == today else ''
+        day['class'] += ' out' if not in_stock else ''
+
+        days += day,
+    return days
+
+
 def session_or_empty(key):
     if key in session:
         return session[key]
@@ -30,6 +59,10 @@ def create_transaction():
 
     lending = session_or_empty('lend')
     buying = session_or_empty('buy')
+
+    ta.group = session_or_empty('group')
+    if ta.group == []:
+        ta.group = 'int'
 
     for id in lending:
         item = Item.query.get(id)
@@ -52,8 +85,10 @@ def dump_transaction(response):
     session['lend'] = {id: ta.lend[id].amount for id in ta.lend}
     session['buy'] = {id: ta.buy[id].amount for id in ta.buy}
 
-    session['date_start'] = ta.date_start
-    session['date_end'] = ta.date_end
+    session['date_start'] = datetime.datetime.combine(ta.date_start, datetime.time())
+    session['date_end'] = datetime.datetime.combine(ta.date_end, datetime.time())
+
+    session['group'] = ta.group
 
     return response
 
@@ -225,46 +260,9 @@ def cart_empty():
 @app.route('/cart/checkout')
 def cart_checkout():
 
-    # read and set a cookie for 
+    # TODO read and set a cookie for 
     # name, address, email, phone, group
 
-    '''
-    lend = session_or_empty('lend')
-    buy = session_or_empty('buy')
-
-    days=0
-    weeks=0
-    if 'from' in session:
-        # Calculate lend duration
-        from datetime import date
-        from math import ceil
-        start = date.fromtimestamp(session['from_ts'])
-        end = date.fromtimestamp(session['until_ts'])
-        days = (end-start).days+1
-        weeks = int(ceil(days/7.0))
-
-    elif lend and sum(lend.values()):
-        flash(u'Gib einen Zeitraum für deine Bestellung an ("verfügbar vom…")', 'error')
-        return list()
-    
-    items = Item.query.all()
-    items = {i.id: i for i in items}
-
-    lend = {items[i]: lend[i] for i in lend if lend[i]>0}
-    buy  = {items[i]: buy[i] for i in buy if buy[i]>0}
-
-    sum_lend = sum( [i.price_lend(days)*lend[i] for i in lend] )
-    sum_buy = sum( [i.price_buy*buy[i] for i in buy] )
-    total = sum_lend+sum_buy
-
-    return pjax('checkout.html',
-                lend=lend,
-                buy=buy,
-                total=total,
-                days=days,
-                weeks=weeks
-                )
-    '''
     ta = g.ta
 
     if ta.lend and not ta.date_start and not ta.date_end:
@@ -289,14 +287,29 @@ def cart_submit():
     db.session.commit()
 
     flash(u'Danke für deine Bestellung!')
-    return list()
+    return cart_empty()
     
 
 
 @app.route('/item/<id>', methods=['GET'])
 def item(id):
+    item = Item.query.get_or_404(id)
     return pjax('detail.html',
-                item=Item.query.get_or_404(id),
+                item=item,
+               ) 
+
+
+@app.route('/item/<id>/stock', methods=['GET'])
+def check_stock(id):
+    item = Item.query.get_or_404(id)
+
+    months = []
+    for m in range(6):
+        months += calendar(m),
+
+    return pjax('stock.html',
+                item=item,
+                months=months,
                ) 
 
 
@@ -436,9 +449,19 @@ def logout():
 @app.route('/admin')
 @login_required
 def admin():
-    1/0
     transactions = Transaction.query.all()
     return pjax('admin.html', transactions=transactions)
+
+
+@app.route('/admin/<id>')
+@login_required
+def admin_transaction(id):
+    transactions = Transaction.query.all()
+    return pjax('admin_transaction.html',
+                transactions=transactions,
+                eta=Transaction.query.get(id)
+                )
+
 
 
 @app.route('/uploads/<path:filename>')

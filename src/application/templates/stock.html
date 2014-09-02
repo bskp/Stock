@@ -1,0 +1,12 @@
+{% extends "content.html" %}
+{% from 'snippets.html' import month %} 
+
+{% block sidebar %}
+    <a class="navi" href="{{ url_for('item', id=item.id) }}"><i class="icon-chevron-left"></i> zurück</a>
+    <h1>{{item.name}}</h1>
+    <h2>Noch zu haben?</h2>
+    {% for days in months %}
+        {{ month(days) }}
+    {% endfor %}
+
+{% endblock %}

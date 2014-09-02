@@ -75,16 +75,17 @@ header{
 }
 
 #sidebar{
+    width: 423px;
     float: right;
     background-color: @white;
     min-height: 100%;
     padding: 1em;
     padding-top: 0.5em;
+    padding-bottom: 50px;
     
     border-left: solid 1px rgba(0, 0, 0, 0.1);
 
     h1{
-        width: 423px;
         margin-top: 0;
     }
 
@@ -105,6 +106,16 @@ header{
 
     img{
         max-width: 423px;
+    }
+
+    .navi{
+        float: right;
+        margin-top: 0.5em;
+
+        &:hover{
+            text-decoration: none;
+            color: @accent;
+        }
     }
 }
 
@@ -179,6 +190,8 @@ textarea, input, select{
     word-spacing: inherit;
     color: inherit;
 
+    .border-radius(0px);
+
     background-color: @shade;
     .placeholder(@gray);
 
@@ -230,6 +243,40 @@ input.datepicker{
     cursor: pointer;
 }
 
+
+table.calendar{
+    width: auto;
+    float: left;
+    text-align: center;
+
+    margin-right: 2em;
+    margin-top: 1em;
+
+    td.out{
+        color: @alt;
+        position: relative;
+
+        &:before{
+            position: absolute;
+            content: "";
+            left: 0;
+            top: 50%;
+            right: 0;
+            border-top: 1px solid;
+            border-color: inherit;
+
+            .transform(rotate(40deg));
+        }
+    }
+    td.blur{ color: @shade; }
+    td.today{ color: @accent; }
+
+    td{
+        padding-right: 2px;
+    }
+}
+
+
 // Icon-buttons
 a i{
     cursor: pointer;
@@ -274,14 +321,6 @@ i.inset{
     margin-left: -1.6em;
     margin-right: 0.45em;
     font-size: 20px;
-}
-
-#calendar{
-    display: none;
-}
-
-#calendar_{
-    height: 240px;
 }
 
 ul.items{
@@ -373,8 +412,9 @@ sup {
 }
 
 
-#sidebar table{
+table{
     width: 100%;
+    #content &{ width: 60%; }
 
     tr.head{
         font-weight: bold;

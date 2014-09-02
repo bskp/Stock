@@ -2,7 +2,10 @@
 
 {% block sidebar %}
     {% if logged_in %}
-    <a href="{{ url_for('item_edit', id=item.id) }}" style="float: right;"><i class="icon-edit icon-2x"></i></a>
+    <a class="navi" href="{{ url_for('item_edit', id=item.id) }}"><i class="icon-edit icon-2x"></i></a>
+    {% endif %}
+    {% if item.lendable -%}
+    <a class="navi" href="{{ url_for('check_stock', id=item.id) }}">Verfügbarkeit <i class="icon-chevron-right"></i></a>
     {% endif %}
 
     <h2>{{item.category}}</h2>
@@ -14,7 +17,7 @@
     {% if item.lendable -%}
         Miete:
         {% if item.tax_base %}
-        <strong>{{ item.tax_base|cash }}</strong> + 
+        <strong>{{ item.tax_base|cash }}</strong> (fix) + 
         {% endif %}
         <strong>{{ item.tax|cash }}</strong> pro {% if item.tax_period == 'week' %}Woche{% else %}Tag{% endif %}<br />
     {% endif %}
@@ -34,6 +37,7 @@
         {% if item.lending %}
             <a href="{{ url_for('item_unlend', id=item.id) }}" title="zurücklegen"><i class="icon-undo inset"></i></a>
         {% endif %}
+
     {% endif %}
 
     {% if item.buyable %}
@@ -47,9 +51,6 @@
             <a href="{{ url_for('item_unbuy', id=item.id) }}" title="zurücklegen"><i class="icon-undo inset"></i></a>
         {% endif %}
     {% endif %}
-
-    <input type="text" value="" data-zdp_disabled_dates='["* * * 0,6"]' class="datepicker readonly" id="calendar" name="calendar">
-    <div id="calendar_"></div>
 
     {% if item.related %}
     <h2>Oli empfiehlt dazu:</h2>

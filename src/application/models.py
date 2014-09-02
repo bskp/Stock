@@ -186,6 +186,8 @@ class Transaction(db.Model):
     
     @property
     def days(self):
+        if not self.date_end or not self.date_start:
+            return 0
         return (self.date_end-self.date_start).days
         
 
