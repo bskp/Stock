@@ -26,6 +26,13 @@ PASSWORD = '0815'
 # Locale to use for frontend
 LOCALE = 'de_CH'
 
+# Email settings
+EMAIL_ADDRESS = 'rast@jubla-freiburg.ch'
+EMAIL_SERVER = 'mail.senselan.ch'
+EMAIL_PORT = 465
+EMAIL_PASSWORD = 'itreck'
+
+
 # Set secret keys for CSRF protection
 SECRET_KEY = CSRF_SECRET_KEY
 CSRF_SESSION_KEY = SESSION_KEY

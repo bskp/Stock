@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+	<head>
+		<title>Bestellbestätigung</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body style="font-family: TeXGyreAdventor-Regular, 'Century Gothic', Helvetica, Arial, sans-serif">
+        <h1>Bestellbestätigung</h1>
+
+        Hallo {{ta.name}}, merci für deine Bestellung. Melde dich einfach per Mail oder per Telefon (026 323 37 60), falls noch Fragen auftauchen oder etwas nicht stimmt:
+
+        <h2>Artikel</h2>
+        {{ ta.date_start|date }} bis {{ ta.date_end|date }}<br />
+        {{ ta.weeks }} Wochen / {{ ta.days }} Tage<br />
+        <br />
+        <table>
+            {% if ta.lend %}
+            <tr style="font-weight: bold; text-transform: uppercase;"><td>Miete</td><td>Tarif</td><td>Dauer</td><td>Stück</td></tr>
+            {% for il in ta.lend.values() %}
+            <tr>
+                <td>{{ il.item.name }}</td>
+                <td>
+                    {% if il.item.tax_base %}{{ il.item.tax_base|cash }} + {% endif %}
+                    {{ il.item.tax|cash }}
+                </td>
+                <td>× {% if il.item.tax_period == 'week' %}{{ ta.weeks }}{% else %}{{ ta.days }}{% endif %}</td>
+                <td>× {{ il.amount }}</td>
+                <td>{{ il.cost(ta.days)|cash }}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+            <tr><td>&nbsp;</td></tr>
+            {% if ta.buy %}
+            <tr style="font-weight: bold; text-transform: uppercase;"><td>Kauf</td><td>Preis</td><td></td><td>Stück</td></tr>
+            {% for il in ta.buy.values() %}
+            <tr>
+                <td>{{ il.item.name }}</td>
+                <td>{{ il.item.price_buy|cash }}</td>
+                <td></td>
+                <td>× {{ il.amount }}</td>
+                <td>{{ il.cost()|cash }}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+            <tr><td>Total<td></td></td><td></td><td></td><td style="font-weight: bold;">{{ ta.cost|cash }}</td></tr>
+        </table>
+
+        <h2>Deine Angaben</h2>
+        Name: {{ ta.name }} <br />
+        Email: {{ ta.email }} <br />
+        Telefon:  {{ ta.tel }} <br />
+        Bezahlung: {{ 'per Rechnung' if ta.payment else 'bar Kralle' }} <br />
+        <br />
+        Lieferung: <br />
+        {{ ta.delivery|default('Wird auf der Rast abgeholt', true) }} <br />
+        <br />
+        Kommentare: <br />
+        {{ ta.remarks|default('-', true) }} <br />
+    </body>
+</html>

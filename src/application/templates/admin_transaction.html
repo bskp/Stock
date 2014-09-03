@@ -1,5 +1,77 @@
 {% extends "admin.html" %}
 {% block sidebar %}
+    <form action="{{ url_for('admin_transaction', id=eta.id) }}" method="post" enctype="multipart/form-data">
+    <h1>Bestellung anpassen</h1>
+    <h2>Status</h2>
+    {% if eta.progress == 'new' -%}
+    Unbestätigt.
+    <a class="btn" href="{{ url_for('admin_transaction_confirm', id=eta.id) }}">Email senden</a>
+    {% endif %}
+    {% if eta.progress == 'confirmed' %}
+    Bestätigt.
+    {% endif %}
 
-    {{ eta.date_start|date }} bis {{ eta.date_end|date }}<br />
+    <h2>Verleihdauer</h2>
+    <input name="date_start" class="datepicker" value="{{ eta.date_start|date }}" /> bis 
+    <input name="date_end" class="datepicker" value="{{ eta.date_end|date }}" /><br />
+    {{ eta.weeks }} Wochen / {{ eta.days }} Tage<br />
+    <table class="receipt">
+        {% if eta.lend %}
+        <tr class="head"><td>Miete</td><td>Tarif</td><td>Dauer</td><td>Stück</td></tr>
+        {% for il in eta.lend.values() %}
+        <tr>
+            <td>{{ il.item.name }}</td>
+            <td>
+                {% if il.item.tax_base %}{{ il.item.tax_base|cash }} + {% endif %}
+                {{ il.item.tax|cash }}
+            </td>
+            <td>× {% if il.item.tax_period == 'week' %}{{ eta.weeks }}{% else %}{{ eta.days }}{% endif %}</td>
+            <td>× <input name="lend_amount_{{ il.item.id }}" class="short" value="{{ il.amount }}" /></td>
+            <td><input name="lend_cost_{{ il.item.id }}" class="short" value="{{ il.override_cost|default('', true) }}" placeholder="{{ il.calc_cost(eta.days) }}" /></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if eta.buy %}
+        <tr class="head"><td>Kauf</td><td>Preis</td><td></td><td>Stück</td></tr>
+        {% for il in eta.buy.values() %}
+        <tr>
+            <td>{{ il.item.name }}</td>
+            <td>{{ il.item.price_buy|cash }}</td>
+            <td></td>
+            <td>× <input name="buy_amount_{{ il.item.id }}" class="short" value="{{ il.amount }}" /></td>
+            <td><input name="buy_cost_{{ il.item.id }}" class="short" value="{{ il.override_cost|default('', true) }}" placeholder="{{ il.calc_cost() }}" /></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        <tr><td>Total<td></td></td><td></td><td></td><td>{{ eta.cost|cash }}</td></tr>
+    </table>
+
+    <h2>Deine Angaben</h2>
+    <label class="fill">Gruppe
+    <span class="select"><select name="group" id="list_group">
+        <option {{ eta.group|option('int') }}>Jubla-Schar</option>
+        <option {{ eta.group|option('edu') }}>Schule</option>
+        <option {{ eta.group|option('ext') }}>Extern</option>
+    </select></span></label>
+    <label class="fill">Name <input name="name" value="{{ eta.name }}" /></label>
+    <label class="fill">Email <input name="email" value="{{ eta.email }}" /></label>
+    <label class="fill">Telefon <input name="tel" value="{{ eta.tel }}" /></label>
+    <label class="fill">Ich bezahle <span class="select"><select name="payment">
+        <option {{ eta.payment|option('0') }}>bar Kralle</option>
+        <option {{ eta.payment|option('1') }}>per Rechnung</option>
+    </select></span></label>
+
+    <br />
+    <label>Adresse
+        <textarea name="delivery" placeholder="Wird auf der Rast abgeholt">{{ eta.delivery|default('', true) }}</textarea>
+    </label>
+
+    <label>Kommentare
+        <textarea name="remarks">{{ eta.remarks|default('', true) }}</textarea>
+    </label>
+
+    <input type="submit" class="btn" name="submit" value="Sichern" />
+    <a class="btn" href="{{ url_for('admin_transaction_delete', id=eta.id) }}">Löschen</a>
+    </form>
 {% endblock %}

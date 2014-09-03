@@ -51,8 +51,13 @@ app.jinja_env.filters['option'] = jinja_option
 # A Helper function
 def make_url_safe(string):
     from unidecode import unidecode
-    from werkzeug.urls import url_fix
-    return url_fix( unidecode( string.replace(' ', '_') ) ).lower()
+    import re
+
+    string = unidecode(string)
+    string = re.sub(' ', '_', string)
+    string = re.sub('[^a-zA-Z0-9+_-]', '', string)
+
+    return string.lower()
 
 
 # Pull in URL dispatch routes and their views

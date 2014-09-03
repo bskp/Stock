@@ -56,12 +56,26 @@ class Item(db.Model):
         return u"<Item %s>" % (self.id)
 
 
-    @property
-    def in_stock(self):
+    def in_stock(self, date):
         ''' Returns the amount of this item in stock during the selected time-
             span. 
         '''
-        return self.count - 0#TODO amount lent during session timespan
+        affected_tas = Transaction.query.filter(db.and_(
+                        Transaction.date_end >= date,
+                        Transaction.date_start <= date,
+                       )).all()
+
+        out = 0
+        for ta in affected_tas:
+            if not self.id in ta.lend:
+                continue
+            out += ta.lend[self.id].amount
+
+        return self.count - out
+
+    @property
+    def in_stock_ta(self):
+        return self.count
 
 
     @property
@@ -82,7 +96,7 @@ class Item(db.Model):
 
     @property
     def available(self):
-        return self.in_stock - self.buying - self.lending
+        return self.in_stock_ta - self.buying - self.lending
 
 
     @property
@@ -124,12 +138,17 @@ class Buy(db.Model):
 
     amount = db.Column(db.Integer)
     item = db.relationship('Item', backref='bought')
-    cost = db.Column(db.Float)  # Possibility to override the cost
+    override_cost = db.Column(db.Float)  # Possibility to override the cost
 
 
     def cost(self):
-        #TODO respect cost-column
+        if self.override_cost:
+            return self.override_cost
+        return self.calc_cost()
+
+    def calc_cost(self):
         return self.amount*self.item.price_buy
+
 
     def __init__(self, item, amount=1):
         self.item=item
@@ -146,11 +165,15 @@ class Lend(db.Model):
 
     amount = db.Column(db.Integer)
     item = db.relationship('Item', backref='lent')
-    cost = db.Column(db.Float)
+    override_cost = db.Column(db.Float)
 
 
     def cost(self, days):
-        #TODO respect cost-column
+        if self.override_cost:
+            return self.override_cost
+        return self.calc_cost(days)
+
+    def calc_cost(self, days):
         return self.amount*self.item.tax_total(days)
 
 
@@ -176,8 +199,14 @@ class Transaction(db.Model):
 
     progress = db.Column(db.Enum(*PROGRESS), default='new')
 
-    buy = db.relationship('Buy', backref='transaction', collection_class=attribute_mapped_collection('item_id'),)
-    lend = db.relationship('Lend', backref='transaction', collection_class=attribute_mapped_collection('item_id'),)
+    buy = db.relationship('Buy', backref='transaction', 
+            collection_class=attribute_mapped_collection('item_id'),
+            cascade="save-update, merge, delete, delete-orphan"
+            )
+    lend = db.relationship('Lend', backref='transaction',
+            collection_class=attribute_mapped_collection('item_id'),
+            cascade="save-update, merge, delete, delete-orphan"
+            )
 
     date_start = db.Column(db.Date)
     date_end = db.Column(db.Date)

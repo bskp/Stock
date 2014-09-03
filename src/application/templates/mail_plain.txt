@@ -1,0 +1,40 @@
+Bestellbestätigung
+==================
+
+Hallo {{ta.name}}, merci für deine Bestellung. Melde dich einfach per Mail oder per Telefon (026 323 37 60), falls noch Fragen auftauchen oder etwas nicht stimmt:
+
+Artikel
+-------
+{{ ta.date_start|date }} bis {{ ta.date_end|date }}
+{{ ta.weeks }} Wochen / {{ ta.days }} Tage
+{% if ta.lend %}
+Miete               Tarif   Dauer   Stück
+{% for il in ta.lend.values() -%}
+{{ il.item.name }} {% if il.item.tax_base %}{{ il.item.tax_base|cash }} + {% endif %}{{ il.item.tax|cash }} × {% if il.item.tax_period == 'week' %}{{ ta.weeks }}{% else %}{{ ta.days }}{% endif %} × {{ il.amount }} {{ il.cost(ta.days)|cash }}
+{% endfor %}
+{% endif %}
+{%- if ta.buy -%}
+Kauf                Preis           Stück
+{% for il in ta.buy.values() -%}
+
+{{ il.item.name }} {{ il.item.price_buy|cash }} × {{ il.amount }} {{ il.cost()|cash }}
+
+{%- endfor %}
+{% endif %}
+Total                                   {{ ta.cost|cash }}
+
+
+Deine Angaben
+-------------
+
+Name: {{ ta.name }} 
+Email: {{ ta.email }} 
+Telefon:  {{ ta.tel }} 
+Bezahlung: {{ 'per Rechnung' if ta.payment else 'bar Kralle' }} 
+
+Lieferung: 
+{{ ta.delivery|default('Wird auf der Rast abgeholt', true) }} 
+
+Kommentare: 
+{{ ta.remarks|default('-', true) }} 
+

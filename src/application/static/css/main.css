@@ -1830,6 +1830,7 @@ textarea.short,
 input.short,
 select.short {
   width: 3em;
+  text-align: right;
 }
 .fill {
   clear: right;

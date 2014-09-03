@@ -25,13 +25,19 @@ $(function() {
             }
         }
     };
+
+    conf2 = $.extend(true, {}, config);
+    conf2.onSelect = null;
+        
     $(document).ready(function(){
         $('#from.datepicker').Zebra_DatePicker(config);
         $('#until.datepicker').Zebra_DatePicker(config);
+        $(document).trigger('pjax:end');
     })
-        
+
     $(document).on('pjax:end', function() {
         $('#search').trigger('change');
+        $('#sidebar .datepicker').Zebra_DatePicker(conf2);
     })
         
     

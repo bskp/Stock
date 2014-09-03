@@ -18,7 +18,9 @@ import datetime
 import uuid
 
 
-def calendar(month_offset=0):
+def calendar(item, month_offset=0):
+    ''' Quick'n'dirty day-structs to build a calendar overview '''
+
     today = datetime.date.today()
     month = today.month-1 + month_offset
     year = today.year + month/12
@@ -32,8 +34,7 @@ def calendar(month_offset=0):
     for dt in range(7*6):  # Generate days for six weeks
         d = day1 + datetime.timedelta(dt)
         day = {}
-        import random
-        in_stock = random.randint(0,2)
+        in_stock = item.in_stock(d)
 
         day['weekday'] = d.weekday()
         day['nr'] = d.day
@@ -46,6 +47,9 @@ def calendar(month_offset=0):
         days += day,
     return days
 
+
+# LAZYNESS HELPERS
+request_or_none= lambda key: request.form.get(key) if request.form.get(key) else None
 
 def session_or_empty(key):
     if key in session:
@@ -85,8 +89,8 @@ def dump_transaction(response):
     session['lend'] = {id: ta.lend[id].amount for id in ta.lend}
     session['buy'] = {id: ta.buy[id].amount for id in ta.buy}
 
-    session['date_start'] = datetime.datetime.combine(ta.date_start, datetime.time())
-    session['date_end'] = datetime.datetime.combine(ta.date_end, datetime.time())
+    session['date_start'] = datetime.datetime.combine(ta.date_start, datetime.time()) if ta.date_start else None
+    session['date_end'] = datetime.datetime.combine(ta.date_end, datetime.time()) if ta.date_end else None
 
     session['group'] = ta.group
 
@@ -164,7 +168,6 @@ def group_filter(group):
 def date_filter(start, end):
     ta = g.ta
 
-    # Provide parsing to epoch-ts
     def parse_date(string):
         return datetime.datetime.strptime(string, '%d._%b_%Y')
 
@@ -287,6 +290,7 @@ def cart_submit():
     db.session.commit()
 
     flash(u'Danke für deine Bestellung!')
+    clear_filter()
     return cart_empty()
     
 
@@ -305,7 +309,7 @@ def check_stock(id):
 
     months = []
     for m in range(6):
-        months += calendar(m),
+        months += calendar(item, m),
 
     return pjax('stock.html',
                 item=item,
@@ -350,15 +354,13 @@ def item_post(id=None):
     if id:
         item = Item.query.get_or_404(id)
     else:
-        replace = make_url_safe(request.form.get('name'))
-        item = Item(id=replace)
+        id = make_url_safe(request.form.get('name'))
+        item = Item(id=id)
         db.session.add(item)
         
     item.name = request.form.get('name')
     item.description = request.form.get('description')
     item.count = int(request.form.get('count')) if request.form.get('count') else 1
-
-    request_or_none = lambda key: float(request.form.get(key)) if request.form.get(key) else None
 
     item.tax_base_int = request_or_none('tax_base_int')
     item.tax_base_edu = request_or_none('tax_base_edu')
@@ -380,7 +382,7 @@ def item_post(id=None):
     if file:
         import os
         from PIL import Image as i
-        filename = secure_filename(replace) + '.jpg'
+        filename = secure_filename(id) + '.jpg'
 
         image = i.open(file)
         if image.mode != "RGB":
@@ -453,15 +455,94 @@ def admin():
     return pjax('admin.html', transactions=transactions)
 
 
-@app.route('/admin/<id>')
+@app.route('/admin/<id>', methods=['GET', 'POST'])
 @login_required
 def admin_transaction(id):
+    if request.method == 'POST':
+        parse_date = lambda s: datetime.datetime.strptime(s, '%d. %b %Y')
+
+        ta = Transaction.query.get(id)
+
+        ta.name = request.form.get('name')
+        ta.email = request.form.get('email')
+        ta.tel = request.form.get('tel')
+        ta.payment = request.form.get('payment')
+        ta.delivery = request_or_none('delivery')
+        ta.remarks = request_or_none('remarks')
+
+        ta.group = request.form.get('group')
+
+        ta.date_start = parse_date(request_or_none('date_start'))
+        ta.date_end = parse_date(request_or_none('date_end'))
+
+        for iid in ta.lend:
+            lend = ta.lend[iid] 
+            lend.amount = request.form.get('lend_amount_'+iid)
+            lend.override_cost = request_or_none('lend_cost_'+iid)
+            
+            if lend.amount == 0:
+                ta.lend.pop(iid)
+
+        for iid in ta.buy:
+            buy = ta.buy[iid] 
+            buy.amount = request.form.get('buy_amount_'+iid)
+            buy.override_cost = request_or_none('buy_cost_'+iid)
+
+            if buy.amount == 0:
+                ta.buy.pop(iid)
+
+        db.session.commit()
+         
+        flash(u'Änderungen wurden gesichert')
+
     transactions = Transaction.query.all()
     return pjax('admin_transaction.html',
                 transactions=transactions,
                 eta=Transaction.query.get(id)
                 )
 
+
+@app.route('/admin/<id>/confirm')
+@login_required
+def admin_transaction_confirm(id):
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    import smtplib
+
+    db.session.rollback()
+    ta = Transaction.query.get(id)
+
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = u'RAST-SPIELMATERIALVERLEIH: Bestellbestätigung'
+    msg['From'] = app.config['EMAIL_ADDRESS']
+    msg['To'] = ta.email
+
+    text = render_template('mail_plain.txt', ta=ta)
+    html = render_template('mail.html', ta=ta)
+
+    msg.attach( MIMEText(text.encode('utf-8'), 'plain') )
+    msg.attach( MIMEText(html.encode('utf-8'), 'html') )
+
+    server = smtplib.SMTP_SSL(app.config['EMAIL_SERVER'], app.config['EMAIL_PORT'])
+    server.login(app.config['EMAIL_ADDRESS'],app.config['EMAIL_PASSWORD'])
+    server.sendmail(app.config['EMAIL_ADDRESS'],ta.email,msg.as_string())
+    server.close()
+
+    ta.progress = 'confirmed'
+    db.session.commit()
+
+    return admin_transaction(id)
+
+@app.route('/admin/<id>/delete')
+@login_required
+def admin_transaction_delete(id):
+    ta = Transaction.query.get(id)
+    db.session.delete(ta)
+    db.session.commit()
+
+    flash(u'Transaktion gelöscht.')
+    return admin()
 
 
 @app.route('/uploads/<path:filename>')
