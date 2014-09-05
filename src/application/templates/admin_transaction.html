@@ -9,6 +9,10 @@
     {% endif %}
     {% if eta.progress == 'confirmed' %}
     Bestätigt.
+    <a class="btn" href="{{ url_for('admin_transaction_return', id=eta.id) }}">Abschliessen</a>
+    {% endif %}
+    {% if eta.progress == 'returned' %}
+    Abgeschlossen.
     {% endif %}
 
     <h2>Verleihdauer</h2>
@@ -22,12 +26,12 @@
         <tr>
             <td>{{ il.item.name }}</td>
             <td>
-                {% if il.item.tax_base %}{{ il.item.tax_base|cash }} + {% endif %}
-                {{ il.item.tax|cash }}
+                {% if il.item.tax_base(eta) %}{{ il.item.tax_base(eta)|cash }} + {% endif %}
+                {{ il.item.tax(eta)|cash }}
             </td>
             <td>× {% if il.item.tax_period == 'week' %}{{ eta.weeks }}{% else %}{{ eta.days }}{% endif %}</td>
             <td>× <input name="lend_amount_{{ il.item.id }}" class="short" value="{{ il.amount }}" /></td>
-            <td><input name="lend_cost_{{ il.item.id }}" class="short" value="{{ il.override_cost|default('', true) }}" placeholder="{{ il.calc_cost(eta.days) }}" /></td>
+            <td><input name="lend_cost_{{ il.item.id }}" class="short" value="{{ il.override_cost|default('', true) }}" placeholder="{{ il.calc_cost(eta) }}" /></td>
         </tr>
         {% endfor %}
         {% endif %}

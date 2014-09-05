@@ -16,10 +16,10 @@
     <p id="description">{{item.description}}</p>
     {% if item.lendable -%}
         Miete:
-        {% if item.tax_base %}
-        <strong>{{ item.tax_base|cash }}</strong> (fix) + 
+        {% if item.tax_base() %}
+        <strong>{{ item.tax_base()|cash }}</strong> (fix) + 
         {% endif %}
-        <strong>{{ item.tax|cash }}</strong> / {% if item.tax_period == 'week' %}Woche{% else %}Tag{% endif %}<br />
+        <strong>{{ item.tax()|cash }}</strong> / {% if item.tax_period == 'week' %}Woche{% else %}Tag{% endif %}<br />
     {% endif %}
 
     {% if item.buyable %}

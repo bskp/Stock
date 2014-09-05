@@ -59,6 +59,11 @@ def session_or_empty(key):
 
 @app.before_request
 def create_transaction():
+    ''' Creates a transaction for the user's shopping cart. Apparently, adding
+    relations to transient transactions somehow auto-adds them to the current
+    session. Which is annoying, as we usually don't want to commit semi-
+    complete transactions. '''
+
     ta = Transaction()
 
     lending = session_or_empty('lend')
@@ -324,6 +329,7 @@ def item_destroy(id):
 
     # TODO: check dependencies
 
+    db.session.rollback() # See comment in create_transaction()
     db.session.delete(item)
     db.session.commit()
 
@@ -337,43 +343,63 @@ def item_destroy(id):
 def item_edit(id=None):
     if id:
         item = Item.query.get_or_404(id)
+        related = ', '.join(i.id for i in item.related)
+        if not related == '':
+            related += ', '
+
     else:
         item = Item()
         # The following attributes are needed to show this dummy-item
         item.count = 1
         item.name = ''
+        related = ''
+
+    itemlist = Item.query.all()
+    itemlist = ' '.join(i.id for i in itemlist)
 
     # Require form
     if request.method == 'GET':
-        return pjax('create_item.html', item=item)
+        return pjax('create_item.html', item=item, itemlist=itemlist, related=related)
 
 
 @app.route('/item_update', methods=['POST'])
 @app.route('/item/<id>/update', methods=['POST'])
 def item_post(id=None):
+    db.session.rollback() # See comment in create_transaction()
     if id:
-        item = Item.query.get_or_404(id)
+        itm = Item.query.get_or_404(id)
     else:
         id = make_url_safe(request.form.get('name'))
-        item = Item(id=id)
-        db.session.add(item)
+        itm = Item(id=id)
+        db.session.add(itm)
         
-    item.name = request.form.get('name')
-    item.description = request.form.get('description')
-    item.count = int(request.form.get('count')) if request.form.get('count') else 1
+    itm.name = request.form.get('name')
+    itm.description = request.form.get('description')
+    itm.count = int(request.form.get('count')) if request.form.get('count') else 1
 
-    item.tax_base_int = request_or_none('tax_base_int')
-    item.tax_base_edu = request_or_none('tax_base_edu')
-    item.tax_base_ext = request_or_none('tax_base_ext')
-    item.tax_int = request_or_none('tax_int')
-    item.tax_edu = request_or_none('tax_edu')
-    item.tax_ext = request_or_none('tax_ext')
+    itm.tax_base_int = request_or_none('tax_base_int')
+    itm.tax_base_edu = request_or_none('tax_base_edu')
+    itm.tax_base_ext = request_or_none('tax_base_ext')
+    itm.tax_int = request_or_none('tax_int')
+    itm.tax_edu = request_or_none('tax_edu')
+    itm.tax_ext = request_or_none('tax_ext')
 
-    item.tax_period = request.form.get('tax_period')
 
-    item.price_buy = request_or_none('price_buy')
+    itm.related = []
+    for iid in request.form.get('related').split(', '):
+        if iid == '':
+            continue
+        i = Item.query.get(iid)
+        if i is None:
+            flash(u'Artikel "%s" ist nicht bekannt!' % iid, 'error')
+            continue
+        itm.related.append(i)
 
-    item.category = request.form.get('category')
+    itm.tax_period = request.form.get('tax_period')
+
+    itm.price_buy = request_or_none('price_buy')
+
+    itm.category = request.form.get('category')
 
     db.session.commit()
 
@@ -408,8 +434,8 @@ def item_post(id=None):
         image = image.crop(resize).resize((140, 140), i.ANTIALIAS)
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), "jpeg")
 
-    flash('%s gesichert.'%item.name, 'success')
-    return list()
+    flash('%s gesichert.'%itm.name, 'success')
+    return item(id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -459,6 +485,7 @@ def admin():
 @login_required
 def admin_transaction(id):
     if request.method == 'POST':
+        db.session.rollback() # See comment in create_transaction()
         parse_date = lambda s: datetime.datetime.strptime(s, '%d. %b %Y')
 
         ta = Transaction.query.get(id)
@@ -510,7 +537,7 @@ def admin_transaction_confirm(id):
 
     import smtplib
 
-    db.session.rollback()
+    db.session.rollback() # See comment in create_transaction()
     ta = Transaction.query.get(id)
 
     msg = MIMEMultipart('alternative')
@@ -529,14 +556,30 @@ def admin_transaction_confirm(id):
     server.sendmail(app.config['EMAIL_ADDRESS'],ta.email,msg.as_string())
     server.close()
 
+    # TODO email gets currently sent twice
+
     ta.progress = 'confirmed'
     db.session.commit()
 
     return admin_transaction(id)
 
+
+@app.route('/admin/<id>/return')
+@login_required
+def admin_transaction_return(id):
+    db.session.rollback() # See comment in create_transaction()
+    ta = Transaction.query.get(id)
+
+    ta.progress = 'returned'
+    db.session.commit()
+
+    return admin_transaction(id)
+
+
 @app.route('/admin/<id>/delete')
 @login_required
 def admin_transaction_delete(id):
+    db.session.rollback() # See comment in create_transaction()
     ta = Transaction.query.get(id)
     db.session.delete(ta)
     db.session.commit()

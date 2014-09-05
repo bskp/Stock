@@ -105,4 +105,21 @@ $(function() {
         }
     });
 
+    $('.completion').on('change paste keyup', function(e) {
+        var items = $(this).data('items').split(' ');
+        var current_input = $(this).val().match(/[^, ]*$/)[0];
+        if (current_input == '' || e.keyCode == 8){ return; }
+
+        var l = current_input.length
+        var completion = '';
+        for (var i=0; i<items.length; i++){
+            if (current_input == items[i].substring(0,l)){
+                completion = items[i].substring(l, 99)+', ';
+                break;
+            }
+        }
+        $(this).val($(this).val()+completion);
+        this.setSelectionRange($(this).val().length-completion.length,99);
+    });
+
 })

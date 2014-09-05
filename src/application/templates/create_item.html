@@ -50,6 +50,11 @@
     <h2>Kauf</h2>
     <label>Fr. <input name="price_buy" value="{{item.price_buy|float('')}}" placeholder="unverkäuflich" /></label>
 
+    <h2>Dazu passt</h2>
+    <label class="fill">Artikel 
+        <input name="related" value="{{ related }}" class="completion" autocomplete="off" data-items="{{ itemlist }}" />
+    </label>
+
     <h2>Foto</h2>
     <input name="image" type="file" accept="image/*" placeholder="Bild auswählen"/>
     <br />

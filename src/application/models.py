@@ -101,7 +101,7 @@ class Item(db.Model):
 
     @property
     def lendable(self):
-        return self.tax is not None
+        return self.tax() is not None
 
 
     @property
@@ -109,26 +109,26 @@ class Item(db.Model):
         return self.price_buy is not None
 
 
-    @property
-    def tax_base(self):
-        ta = g.ta
+    def tax_base(self, transaction=None):
+        ta = transaction or g.ta 
         return getattr(self, 'tax_base_'+ta.group)
 
 
-    @property
-    def tax(self):
-        ta = g.ta
+    def tax(self, transaction=None):
+        ta = transaction or g.ta 
         return getattr(self, 'tax_'+ta.group)
 
 
-    def tax_total(self, days):
+    def tax_total(self, transaction=None):
+        ta = transaction or g.ta 
+
         from math import ceil
         if self.tax_period == 'week':
-            periods = int(ceil(days/7.0))
+            periods = int(ceil(ta.days/7.0))
         else:
-            periods = days
+            periods = ta.days
 
-        return self.tax_base + periods*self.tax
+        return self.tax_base(ta) + periods*self.tax(ta)
 
 
 
@@ -168,13 +168,14 @@ class Lend(db.Model):
     override_cost = db.Column(db.Float)
 
 
-    def cost(self, days):
+    def cost(self, transaction=None):
         if self.override_cost:
             return self.override_cost
-        return self.calc_cost(days)
+        return self.calc_cost(transaction)
 
-    def calc_cost(self, days):
-        return self.amount*self.item.tax_total(days)
+    def calc_cost(self, transaction=None):
+        ta = transaction or g.ta
+        return self.amount*self.item.tax_total(ta)
 
 
     def __init__(self, item, amount=1):
@@ -237,7 +238,7 @@ class Transaction(db.Model):
 
     @property
     def cost(self):
-        lends = [il.cost(self.days) for il in self.lend.values()]
+        lends = [il.cost(self) for il in self.lend.values()]
         buys = [il.cost() for il in self.buy.values()]
         return sum(lends) + sum(buys)
 

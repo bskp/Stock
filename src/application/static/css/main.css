@@ -1634,6 +1634,9 @@ header select:-ms-input-placeholder {
   text-decoration: none;
   color: #00a7db;
 }
+#sidebar ul {
+  margin-top: 0;
+}
 #flash {
   position: fixed;
   bottom: 3em;
