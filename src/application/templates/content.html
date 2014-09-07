@@ -66,7 +66,7 @@
 <aside id="cart">
     {{ ta.n_in_cart }}×<i class="icon-shopping-cart"></i>
     <a href="{{ url_for('cart_empty') }}">Leeren</a>
-    <a href="{{ url_for('cart_checkout') }}" style="float: right;">Bestellen</a>
+    <a href="{{ url_for('cart_checkout') }}" style="float: right;">Adresse angeben & bestellen <i class="icon-chevron-right"></i></a>
 </aside>
 {% endblock %}
 {% endif %}

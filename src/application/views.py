@@ -124,6 +124,8 @@ def pjax(template, **kwargs):
 
     kwargs['logged_in'] = 'logged_in' in session
 
+    session['referrer'] =  request.url
+
     if "X-PJAX" in request.headers:
         return render_template(template, items=items, ta=ta, **kwargs)
     
@@ -134,6 +136,10 @@ def pjax(template, **kwargs):
                            ta=ta,
                            **kwargs
                            )
+
+
+def same():
+    return redirect( session['referrer'] )
 
 
 def login_required(f):
@@ -156,17 +162,17 @@ def list():
 def cat_filter(category):
     if category == 'all':
         session.pop('category')
-        return list()
+        return same()
     if not category in CATEGORIES:
         flash(u'Kategorie ungültig!', 'error')
     session['category'] = category
-    return list()
+    return same()
 
 
 @app.route('/filter/group/<string:group>')
 def group_filter(group):
     g.ta.group= group
-    return list()
+    return same()
 
 
 @app.route('/filter/between/<string:start>/and/<string:end>')
@@ -183,7 +189,7 @@ def date_filter(start, end):
     if ta.date_start > ta.date_end:
         ta.date_start, ta.date_end = ta.date_end, ta.date_start
 
-    return list()
+    return same()
 
 
 @app.route('/filter/none')
@@ -194,7 +200,7 @@ def clear_filter():
     ta.date_end = None
     
     #return redirect(url_for('list'))
-    return list()
+    return same()
 
 
 @app.route('/item/<id>/lend')
@@ -209,7 +215,7 @@ def item_lend(id):
         ta.lend[id] = Lend(it)
 
     flash('%s eingepackt.'%id, 'success')
-    return item(id)
+    return same()
     
 
 @app.route('/item/<id>/buy')
@@ -224,7 +230,7 @@ def item_buy(id):
         ta.buy[id] = Buy(it)
 
     flash('%s eingepackt.'%id, 'success')
-    return item(id)
+    return same()
 
 
 @app.route('/item/<id>/unlend')
@@ -239,7 +245,7 @@ def item_unlend(id):
 
     if ta.lend[id].amount == 0:
         ta.lend.pop(id)
-    return item(id)
+    return same()
 
 
 @app.route('/item/<id>/unbuy')
@@ -254,7 +260,7 @@ def item_unbuy(id):
 
     if ta.buy[id].amount == 0:
         ta.buy.pop(id)
-    return item(id)
+    return same()
     
 
 @app.route('/cart/empty')
@@ -303,9 +309,7 @@ def cart_submit():
 @app.route('/item/<id>', methods=['GET'])
 def item(id):
     item = Item.query.get_or_404(id)
-    return pjax('detail.html',
-                item=item,
-               ) 
+    return pjax('detail.html', item=item) 
 
 
 @app.route('/item/<id>/stock', methods=['GET'])
@@ -319,7 +323,7 @@ def check_stock(id):
     return pjax('stock.html',
                 item=item,
                 months=months,
-               ) 
+                ) 
 
 
 @app.route('/item/<id>/destroy', methods=['GET', 'POST'])
@@ -435,7 +439,7 @@ def item_post(id=None):
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), "jpeg")
 
     flash('%s gesichert.'%itm.name, 'success')
-    return item(id)
+    return redirect( url_for('item', id=id) )
 
 
 @app.route('/login', methods=['GET', 'POST'])
