@@ -128,6 +128,8 @@ class Item(db.Model):
         else:
             periods = ta.days
 
+        if self.tax_base(ta) is None or self.tax(ta) is None:
+            return -1.0
         return self.tax_base(ta) + periods*self.tax(ta)
 
 

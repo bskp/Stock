@@ -22,7 +22,7 @@ app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 # jinja custom filter for pretty cash-amounts
 def jinja_cash(amount):
     if not amount:
-        return '-.-'
+        return 'gratis'
     big, small = str(amount).split('.')
     if small == '0':
         small = '-'

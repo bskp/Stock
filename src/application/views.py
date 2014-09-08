@@ -27,7 +27,7 @@ def calendar(item, month_offset=0):
     month = month % 12 +1
     day1 = datetime.date(year, month, 1)  # 1. of current month
     day1 = day1 - datetime.timedelta(7)  # Go back a week
-    while day1.weekday():  # Monday -> 0
+    while day1.weekday():  # Skip to the next monday
         day1 = day1 + datetime.timedelta(1)
     
     days = []
@@ -38,6 +38,7 @@ def calendar(item, month_offset=0):
 
         day['weekday'] = d.weekday()
         day['nr'] = d.day
+        # strftime apparently has unicode-issues
         day['month'] = d.strftime(u'%B %Y'.encode('utf-8')).decode('utf-8')
         day['title'] = u'%u Stück' % in_stock
         day['class'] = 'blur' if not d.month == month else ''
@@ -49,7 +50,7 @@ def calendar(item, month_offset=0):
 
 
 # LAZYNESS HELPERS
-request_or_none= lambda key: request.form.get(key) if request.form.get(key) else None
+request_or_none = lambda key: request.form.get(key) if request.form.get(key) else None
 
 def session_or_empty(key):
     if key in session:
@@ -60,9 +61,9 @@ def session_or_empty(key):
 @app.before_request
 def create_transaction():
     ''' Creates a transaction for the user's shopping cart. Apparently, adding
-    relations to transient transactions somehow auto-adds them to the current
-    session. Which is annoying, as we usually don't want to commit semi-
-    complete transactions. '''
+    relations to transient transactions somehow automatically adds them to the
+    current session. As we usually don't want to commit semi-complete
+    transactions, DB modifications are prepent with session.rollback(). '''
 
     ta = Transaction()
 
@@ -83,6 +84,9 @@ def create_transaction():
 
     ta.date_start = session_or_empty('date_start')
     ta.date_end = session_or_empty('date_end')
+    ta.name = session_or_empty('name')
+    ta.email = session_or_empty('email')
+    ta.tel = session_or_empty('tel')
 
     g.ta = ta
 
@@ -97,14 +101,21 @@ def dump_transaction(response):
     session['date_start'] = datetime.datetime.combine(ta.date_start, datetime.time()) if ta.date_start else None
     session['date_end'] = datetime.datetime.combine(ta.date_end, datetime.time()) if ta.date_end else None
 
+    session['name'] = ta.name
+    session['email'] = ta.email
+    session['tel'] = ta.tel
+
     session['group'] = ta.group
 
     return response
 
 
 def pjax(template, **kwargs):
-    '''Determine whether the request was made by PJAX.'''
+    ''' Filter which items to show and determine whether the request was made
+        by PJAX.
+    '''
 
+    # Filter by category
     category=''
     if 'category' in session:
         category = session['category']
@@ -115,30 +126,35 @@ def pjax(template, **kwargs):
 
     ta = g.ta
 
+    # Filter by availability
     if ta.group and not 'logged_in' in session:
         items = filter(lambda i: i.buyable or i.lendable, items)
 
+    # Filter by date
     if ta.date_start and ta.date_end:
         #items = filter(Item.in_stock, items)
         pass
 
-    kwargs['logged_in'] = 'logged_in' in session
 
+    # Safe referrer explicitly to session as request.referer did not work
     session['referrer'] =  request.url
 
+    kwargs['logged_in'] = 'logged_in' in session
+    kwargs['items'] = items
+    kwargs['ta'] = ta
+
     if "X-PJAX" in request.headers:
-        return render_template(template, items=items, ta=ta, **kwargs)
+        return render_template(template, **kwargs)
     
     return render_template('base.html',
                            template = template,
-                           items=items,
                            category=category,
-                           ta=ta,
                            **kwargs
                            )
 
 
 def same():
+    ''' Keep the user on the current view, but refresh it. '''
     return redirect( session['referrer'] )
 
 
@@ -157,6 +173,13 @@ def login_required(f):
 def list():
     return pjax('content.html')
 
+
+@app.route('/uploads/<path:filename>')
+def send_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+### ITEM-FILTER VIEWS
 
 @app.route('/filter/category/<string:category>')
 def cat_filter(category):
@@ -180,10 +203,17 @@ def date_filter(start, end):
     ta = g.ta
 
     def parse_date(string):
-        return datetime.datetime.strptime(string, '%d._%b_%Y')
+        try:
+            return datetime.datetime.strptime(string, '%d._%b_%Y')
+        except ValueError:
+            flash(u'"%s" ist emfall kein gültiges Datum!' % string)
+            return None
 
     ta.date_start = parse_date(start)
     ta.date_end = parse_date(end)
+
+    if not ta.date_start or not ta.date_end:
+        return same()
 
     # Enforce date order
     if ta.date_start > ta.date_end:
@@ -199,9 +229,10 @@ def clear_filter():
     ta.date_start = None
     ta.date_end = None
     
-    #return redirect(url_for('list'))
     return same()
 
+
+### CART VIEWS
 
 @app.route('/item/<id>/lend')
 def item_lend(id):
@@ -214,7 +245,7 @@ def item_lend(id):
         it= Item.query.get(id)
         ta.lend[id] = Lend(it)
 
-    flash('%s eingepackt.'%id, 'success')
+    #flash('%s eingepackt.'%id, 'success')
     return same()
     
 
@@ -229,7 +260,7 @@ def item_buy(id):
         it= Item.query.get(id)
         ta.buy[id] = Buy(it)
 
-    flash('%s eingepackt.'%id, 'success')
+    #flash('%s eingepackt.'%id, 'success')
     return same()
 
 
@@ -280,7 +311,7 @@ def cart_checkout():
     ta = g.ta
 
     if ta.lend and not ta.date_start and not ta.date_end:
-        flash(u'Gib einen Zeitraum für deine Bestellung an ("verfügbar vom…")', 'error')
+        flash(u'Gib oben einen Zeitraum für deine Bestellung an!', 'header .datepicker')
         return list()
 
     return pjax('checkout.html')
@@ -297,6 +328,15 @@ def cart_submit():
     ta.delivery = request.form.get('delivery')
     ta.remarks = request.form.get('remarks')
 
+
+    # Validate fields
+    required = 'name email tel'.split(' ')
+    for field in required:
+        val = request.form.get(field)
+        if not val:
+            flash('Bitte gib deine %s an!' % field, 'input[name="%s"]' % field)
+            return same()
+
     db.session.add(ta)
     db.session.commit()
 
@@ -305,6 +345,7 @@ def cart_submit():
     return cart_empty()
     
 
+### ITEM VIEWS
 
 @app.route('/item/<id>', methods=['GET'])
 def item(id):
@@ -320,11 +361,10 @@ def check_stock(id):
     for m in range(6):
         months += calendar(item, m),
 
-    return pjax('stock.html',
-                item=item,
-                months=months,
-                ) 
+    return pjax('stock.html', item=item, months=months) 
 
+
+### ITEM ADMIN VIEWS
 
 @app.route('/item/<id>/destroy', methods=['GET', 'POST'])
 @login_required
@@ -337,7 +377,7 @@ def item_destroy(id):
     db.session.delete(item)
     db.session.commit()
 
-    flash(u'%s gelöscht.'%id, 'success')
+    flash(u'%s gelöscht.'%id)
     return redirect(url_for('list'))
 
 
@@ -395,7 +435,7 @@ def item_post(id=None):
             continue
         i = Item.query.get(iid)
         if i is None:
-            flash(u'Artikel "%s" ist nicht bekannt!' % iid, 'error')
+            flash(u'Artikel "%s" ist nicht bekannt!' % ii )
             continue
         itm.related.append(i)
 
@@ -438,9 +478,11 @@ def item_post(id=None):
         image = image.crop(resize).resize((140, 140), i.ANTIALIAS)
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), "jpeg")
 
-    flash('%s gesichert.'%itm.name, 'success')
+    #flash('%s gesichert.'%itm.name)
     return redirect( url_for('item', id=id) )
 
+
+### LOGIN/OUT VIEWS
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -449,7 +491,6 @@ def login():
     from base64 import b64encode
 
     if 'logged_in' in session:
-        flash('Du bist bereits angemeldet')
         return redirect(url_for('list'))
 
     if request.method == 'POST':
@@ -460,10 +501,10 @@ def login():
 
         if hsh_valid == hsh_given:
             session['logged_in'] = True
-            flash('Du bist jetzt angemeldet.')
+            flash('Hallo Chef.')
             return redirect(url_for('list'))
 
-        flash(u'Ungültiges Kennwort!', 'error')
+        flash(u'Ungültiges Kennwort!')
     
     challenge = b64encode(get_random_bytes(64))
     session['challenge'] = challenge
@@ -477,6 +518,8 @@ def logout():
     session.pop('logged_in', None)
     return redirect(url_for('list'))
 
+
+### TRANSACTION ADMIN VIEWS
 
 @app.route('/admin')
 @login_required
@@ -524,7 +567,7 @@ def admin_transaction(id):
 
         db.session.commit()
          
-        flash(u'Änderungen wurden gesichert')
+        #flash(u'Änderungen wurden gesichert')
 
     transactions = Transaction.query.all()
     return pjax('admin_transaction.html',
@@ -560,7 +603,7 @@ def admin_transaction_confirm(id):
     server.sendmail(app.config['EMAIL_ADDRESS'],ta.email,msg.as_string())
     server.close()
 
-    # TODO email gets currently sent twice
+    # TODO email currently gets sent twice
 
     ta.progress = 'confirmed'
     db.session.commit()
@@ -588,13 +631,9 @@ def admin_transaction_delete(id):
     db.session.delete(ta)
     db.session.commit()
 
-    flash(u'Transaktion gelöscht.')
+    #flash(u'Transaktion gelöscht.')
     return admin()
 
-
-@app.route('/uploads/<path:filename>')
-def send_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 ## Error handlers
 # Handle 404 errors

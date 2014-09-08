@@ -69,6 +69,9 @@ Project based on the [Flask on App Engine Project Template][gaet] by Kamal Gill
 
 [Pjax] by Chris Wanstrath
 
+Teacher illustration by Wilhelm Busch (Public domain), via [Wikimedia Commons][Busch]
+
+[Busch]: http://commons.wikimedia.org/wiki/File%3AMax_und_Moritz_(Busch)_040.png
 [Pjax]: https://github.com/defunkt/jquery-pjax
 [gaet]: https://github.com/kamalgill/flask-appengine-template
 [flask]: http://flask.pocoo.org

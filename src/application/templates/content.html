@@ -1,17 +1,9 @@
 <aside id="sidebar">
 {% block sidebar %}
-<h2>Hallo. Das ist der neue Rast-Spielmaterialverleih!</h2>
+<h1>Hallo. Das ist der neue Rast-Spielmaterialverleih!</h1>
 <ul>
     <li>Alle verfügbaren Artikel siehst du links</li>
 </ul>
-{% endblock %}
-</aside>
-
-<aside id="flash">
-{% block flash %}
-    {% for category, message in get_flashed_messages(with_categories=True) %}
-    <div class="flash {{ category }}">{{ message }}</div>
-    {% endfor %}
 {% endblock %}
 </aside>
 
@@ -70,3 +62,14 @@
 </aside>
 {% endblock %}
 {% endif %}
+
+{% if get_flashed_messages() %}
+<aside id="flash">
+    <ul>
+    {% for selector, message in get_flashed_messages(with_categories=True) %}
+        <li data-selector="{{ selector }}">{{ message }}</div>
+    {% endfor %}
+    </ul>
+</aside>
+{% endif %}
+

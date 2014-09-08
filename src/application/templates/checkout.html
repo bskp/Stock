@@ -13,12 +13,12 @@
         <tr>
             <td>{{ il.item.name }}</td>
             <td>
-                {% if il.item.tax_base %}{{ il.item.tax_base|cash }} + {% endif %}
-                {{ il.item.tax|cash }}
+                {% if il.item.tax_base() %}{{ il.item.tax_base()|cash }} + {% endif %}
+                {{ il.item.tax()|cash }}
             </td>
             <td>× {% if il.item.tax_period == 'week' %}{{ ta.weeks }}{% else %}{{ ta.days }}{% endif %}</td>
             <td>× {{ il.amount }}</td>
-            <td>{{ il.cost(ta.days)|cash }}</td>
+            <td>{{ il.cost()|cash }}</td>
         </tr>
         {% endfor %}
         {% endif %}
@@ -39,9 +39,9 @@
     </table>
 
     <h2>Deine Angaben</h2>
-    <label class="fill">Name <input name="name" value="" /></label>
-    <label class="fill">Email <input name="email" value="" /></label>
-    <label class="fill">Telefon <input name="tel" value="" /></label>
+    <label class="fill">Name <input name="name" value="{{ ta.name|default('', True) }}" /></label>
+    <label class="fill">Email <input name="email" value="{{ ta.email|default('', True) }}" /></label>
+    <label class="fill">Telefon <input name="tel" value="{{ ta.tel|default('', True) }}" /></label>
     <label class="fill">Ich bezahle <span class="select"><select name="payment">
         <option value="0">bar Kralle</option>
         <option value="1">per Rechnung</option>

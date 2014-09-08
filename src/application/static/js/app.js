@@ -26,7 +26,7 @@ $(function() {
         }
     };
 
-    conf2 = $.extend(true, {}, config);
+    conf2 = $.extend(true, {}, config);  // copy dictionary
     conf2.onSelect = null;
         
     $(document).ready(function(){
@@ -38,6 +38,13 @@ $(function() {
     $(document).on('pjax:end', function() {
         $('#search').trigger('change');
         $('#sidebar .datepicker').Zebra_DatePicker(conf2);
+
+        // Highlight fields for flashed messages
+        $('.highlight').removeClass('highlight');
+        $('#flash li').each( function(){
+            var sel = $(this).data('selector');
+            $(sel).addClass('highlight');
+        });
     })
         
     
@@ -105,7 +112,7 @@ $(function() {
         }
     });
 
-    $('.completion').on('change paste keyup', function(e) {
+    $('.completion').on('keyup', function(e) {
         var items = $(this).data('items').split(' ');
         var current_input = $(this).val().match(/[^, ]*$/)[0];
         if (current_input == '' || e.keyCode == 8){ return; }

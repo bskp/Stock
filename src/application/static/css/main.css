@@ -1639,9 +1639,33 @@ header select:-ms-input-placeholder {
 }
 #flash {
   position: fixed;
-  bottom: 3em;
-  margin: 0.2em 1em;
-  font-style: italic;
+  bottom: 0;
+  background-image: url('/static/img/laempel.png');
+  background-repeat: no-repeat;
+  height: 400px;
+  width: 300px;
+}
+#flash ul {
+  background-color: #ffffff;
+  position: relative;
+  left: 300px;
+  top: -50px;
+  width: 200px;
+  border-radius: 99px;
+  padding: 2em 0;
+  box-shadow: white 0 1px 20px 25px;
+  font-weight: bold;
+  text-align: center;
+  list-style-type: none;
+}
+#flash ul li + li {
+  margin-top: 1em;
+}
+header .highlight {
+  background-color: rgba(255, 255, 255, 0.34) !important;
+}
+#sidebar .highlight {
+  background-color: rgba(0, 0, 0, 0.34);
 }
 #admin {
   position: absolute;

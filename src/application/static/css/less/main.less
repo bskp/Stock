@@ -126,10 +126,43 @@ header{
 
 #flash{
     position: fixed;
-    bottom: 3em;
-    margin: 0.2em 1em;
-    font-style: italic;
+    bottom: 0;
+    background-image: url('/static/img/laempel.png');
+    background-repeat: no-repeat;
+    height: 400px;
+    width: 300px;
+
+    ul{
+        background-color: @white;
+        position: relative;
+        left: 300px;
+        top: -50px;
+        width: 200px;
+        border-radius: 99px;
+        padding: 2em 0;
+        box-shadow: white 0 1px 20px 25px;
+
+        font-weight: bold;
+        text-align: center;
+        list-style-type: none;
+
+        li + li{
+            margin-top: 1em;
+        }
+    }
 }
+
+// Flashs can highlight elements:
+
+.highlight{
+    header &{
+        background-color: rgba(255, 255, 255, 0.34) !important;
+    }
+    #sidebar &{
+        background-color: rgba(0, 0, 0, 0.34);
+    }
+}
+
 
 #admin{
     position: absolute;
