@@ -10,7 +10,7 @@ Artikel
 {% if ta.lend %}
 Miete               Tarif   Dauer   Stück
 {% for il in ta.lend.values() -%}
-{{ il.item.name }} {% if il.item.tax_base %}{{ il.item.tax_base|cash }} + {% endif %}{{ il.item.tax|cash }} × {% if il.item.tax_period == 'week' %}{{ ta.weeks }}{% else %}{{ ta.days }}{% endif %} × {{ il.amount }} {{ il.cost(ta.days)|cash }}
+{{ il.item.name }} {% if il.item.tax_base(ta) %}{{ il.item.tax_base(ta)|cash }} + {% endif %}{{ il.item.tax(ta)|cash }} × {% if il.item.tax_period == 'week' %}{{ ta.weeks }}{% else %}{{ ta.days }}{% endif %} × {{ il.amount }} {{ il.cost(ta)|cash }}
 {% endfor %}
 {% endif %}
 {%- if ta.buy -%}
