@@ -125,14 +125,23 @@ def pjax(template, **kwargs):
 
     ta = g.ta
 
-    # Filter by availability
+    # Filter by group
     if ta.group and not 'logged_in' in session:
         items = filter(lambda i: i.buyable or i.lendable, items)
 
     # Filter by date
     if ta.date_start and ta.date_end:
-        #items = filter(Item.in_stock, items)
-        pass
+        colliding_tas = Transaction.query.filter(db.and_(
+                           Transaction.date_end >= ta.date_start,
+                           Transaction.date_start <= ta.date_end
+                       )).all()
+        for item in items:
+            for colliding_ta in colliding_tas:
+                gone = 0
+                if item.id in colliding_ta.lend:
+                    gone += colliding_ta.lend[item.id].amount
+                if gone >= item.count:
+                    items.remove(item)
 
 
     # Safe referrer explicitly to session as request.referer did not work
@@ -451,7 +460,7 @@ def item_post(id=None):
     if file:
         import os
         from PIL import Image as i
-        filename = secure_filename(id) + '.jpg'
+        filename = secure_filename(id).lower() + '.jpg'
 
         image = i.open(file)
         if image.mode != "RGB":
