@@ -5,13 +5,11 @@ Initialize Flask app
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
-from flask_debugtoolbar import DebugToolbarExtension
 import locale
 
 app = Flask('application')
 app.config.from_object('application.settings')
 db = SQLAlchemy(app)
-toolbar = DebugToolbarExtension(app)
 
 locale.setlocale(locale.LC_ALL, app.config['LOCALE'])
 

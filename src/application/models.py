@@ -73,6 +73,17 @@ class Item(db.Model):
 
         return self.count - out
 
+    '''
+    a sketch
+    def in_stock(start, end):
+        affected_tas = Transaction.query.filter(db.and_(
+                        Transaction.date_end >= start,
+                        Transaction.date_start <= end
+                       )).all()
+    '''
+    
+
+
     @property
     def in_stock_ta(self):
         return self.count

@@ -123,7 +123,6 @@ def pjax(template, **kwargs):
     else:
         items = Item.query.order_by('name').all()
 
-
     ta = g.ta
 
     # Filter by availability

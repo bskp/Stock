@@ -2063,6 +2063,10 @@ table.receipt td {
 }
 table.receipt td:first-child {
   text-align: left;
+  max-width: 10em;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .Zebra_DatePicker *,
 .Zebra_DatePicker *:after,
