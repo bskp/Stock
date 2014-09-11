@@ -10,7 +10,7 @@ from flask import request, render_template, flash, url_for, redirect, send_from_
 from werkzeug import secure_filename
 
 from application import app, make_url_safe, db
-from models import Item, Transaction, Buy, Lend, CATEGORIES, PROGRESS
+from models import Item, Transaction, Buy, Lend, CATEGORIES, PROGRESS, GROUPS
 
 from functools import wraps
 
@@ -140,7 +140,7 @@ def pjax(template, **kwargs):
                 gone = 0
                 if item.id in colliding_ta.lend:
                     gone += colliding_ta.lend[item.id].amount
-                if gone >= item.count:
+                if gone >= item.count and item in items:
                     items.remove(item)
 
 
@@ -171,7 +171,6 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not 'logged_in' in session:
-            flash(u'Du bist nicht angemeldet!', 'error')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -195,14 +194,18 @@ def cat_filter(category):
         session.pop('category')
         return same()
     if not category in CATEGORIES:
-        flash(u'Kategorie ungültig!', 'error')
-    session['category'] = category
+        flash(u'Kategorie "%s" ungültig!' % category)
+    else:
+        session['category'] = category
     return same()
 
 
 @app.route('/filter/group/<string:group>')
 def group_filter(group):
-    g.ta.group= group
+    if not group in GROUPS:
+        flash(u'Gruppe "%s" ungültig!' % group)
+    else:
+        g.ta.group=group
     return same()
 
 
@@ -277,7 +280,7 @@ def item_unlend(id):
     ta = g.ta
 
     if not id in ta.lend or ta.lend[id].amount < 1:
-        flash('%s nicht eingepackt'%id, 'error')
+        flash('%s nicht eingepackt'%id)
         return item(id)
 
     ta.lend[id].amount -= 1
@@ -292,7 +295,7 @@ def item_unbuy(id):
     ta = g.ta
 
     if not id in ta.buy or ta.buy[id].amount < 1:
-        flash('%s nicht eingepackt'%id, 'error')
+        flash('%s nicht eingepackt'%id)
         return item(id)
 
     ta.buy[id].amount -= 1
@@ -319,8 +322,11 @@ def cart_checkout():
     ta = g.ta
 
     if ta.lend and not ta.date_start and not ta.date_end:
-        flash(u'Gib oben einen Zeitraum für deine Bestellung an!', 'header .datepicker')
-        return list()
+        flash(u'Gib einen Zeitraum für deine Bestellung an!', '#sidebar .datepicker:first-child')
+    else:
+        for li in ta.lend.values():
+            if not li.valid():
+                flash(u'Für die gewählte Periode nicht an Lager <a href="%s"><i class="icon-calendar"></i></a>' % url_for('check_stock', id=li.item.id), '#lend_'+li.item.id)
 
     return pjax('checkout.html')
 
@@ -337,25 +343,41 @@ def cart_submit():
     ta.remarks = request.form.get('remarks')
 
 
+    # Validate items
+    ok = True
+    for li in ta.lend.values():
+        if not li.valid():
+            flash(u'Für die gewählte Periode nicht an Lager <a href="%s"><i class="icon-calendar"></i></a>' % url_for('check_stock', id=li.item.id), '#lend_'+li.item.id)
+            ok = False
+
     # Validate fields
     required = 'name email tel'.split(' ')
     for field in required:
         val = request.form.get(field)
         if not val:
             flash('Bitte gib deine %s an!' % field, 'input[name="%s"]' % field)
-            return same()
+            ok = False
+
+    if not ok:
+        return same()
 
     db.session.add(ta)
     db.session.commit()
 
-    flash(u'Danke für deine Bestellung!')
     clear_filter()
-    return cart_empty()
+    cart_empty()
+
+    return thankyou()
+
+
+@app.route('/cart/thankyou')
+def thankyou():
+    return pjax('thankyou.html')
     
 
 ### ITEM VIEWS
 
-@app.route('/item/<id>', methods=['GET'])
+@app.route('/item/<id>')
 def item(id):
     item = Item.query.get_or_404(id)
     return pjax('detail.html', item=item) 
@@ -499,7 +521,7 @@ def login():
     from base64 import b64encode
 
     if 'logged_in' in session:
-        return redirect(url_for('list'))
+        return redirect(url_for('admin'))
 
     if request.method == 'POST':
         challenge = session['challenge']
@@ -510,7 +532,7 @@ def login():
         if hsh_valid == hsh_given:
             session['logged_in'] = True
             flash('Hallo Chef.')
-            return redirect(url_for('list'))
+            return redirect(url_for('admin'))
 
         flash(u'Ungültiges Kennwort!')
     
@@ -532,7 +554,7 @@ def logout():
 @app.route('/admin')
 @login_required
 def admin():
-    transactions = Transaction.query.all()
+    transactions = Transaction.query.order_by('date desc').all()
     return pjax('admin.html', transactions=transactions)
 
 
@@ -577,7 +599,7 @@ def admin_transaction(id):
          
         #flash(u'Änderungen wurden gesichert')
 
-    transactions = Transaction.query.all()
+    transactions = Transaction.query.order_by('date desc').all()
     return pjax('admin_transaction.html',
                 transactions=transactions,
                 eta=Transaction.query.get(id)

@@ -1610,18 +1610,15 @@ header select:-ms-input-placeholder {
 }
 #sidebar h1 {
   margin-top: 0;
+  line-height: 1.2em;
 }
 #sidebar h2 {
   text-transform: uppercase;
   font-size: 1em;
   margin-bottom: 0;
 }
-#sidebar h1 + h2 {
-  margin-top: -1em;
-}
 #sidebar #description {
   font-style: italic;
-  width: 423px;
 }
 #sidebar img {
   max-width: 423px;
@@ -1637,7 +1634,7 @@ header select:-ms-input-placeholder {
 #sidebar ul {
   margin-top: 0;
 }
-#flash {
+#flashs {
   position: fixed;
   bottom: 0;
   background-image: url('/static/img/laempel.png');
@@ -1645,27 +1642,48 @@ header select:-ms-input-placeholder {
   height: 400px;
   width: 300px;
 }
-#flash ul {
+#flashs div {
   background-color: #ffffff;
   position: relative;
   left: 300px;
   top: -50px;
-  width: 200px;
+  display: inline-block;
+  max-width: 200px;
   border-radius: 99px;
-  padding: 2em 0;
-  box-shadow: white 0 1px 20px 25px;
+  padding: 2em;
+  box-shadow: black 0 6px;
+  border: 2px solid black;
   font-weight: bold;
   text-align: center;
   list-style-type: none;
 }
-#flash ul li + li {
-  margin-top: 1em;
+#flashs div div + div {
+  margin-top: 3em;
 }
-header .highlight {
-  background-color: rgba(255, 255, 255, 0.34) !important;
+#sidebar .flash {
+  margin-top: -32px;
+  position: absolute;
+  right: 480px;
+  background-color: #f57308;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  z-index: 5;
 }
-#sidebar .highlight {
-  background-color: rgba(0, 0, 0, 0.34);
+#sidebar .flash:after {
+  content: '\f0da';
+  font-family: FontAwesome;
+  display: block;
+  font-size: 40px;
+  position: absolute;
+  right: -10px;
+  top: 1px;
+  color: #f57308;
+}
+#sidebar .flash a:hover i {
+  color: white;
+}
+tr.invalid {
+  text-decoration: line-through;
 }
 #admin {
   position: absolute;

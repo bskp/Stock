@@ -13,6 +13,10 @@ $(function() {
         format: 'j. M Y',
         
         onSelect: function(){
+            $(this).trigger('change');
+        }
+        /*
+        onSelect: function(){
             var from = $('#from').val();
             var until = $('#until').val();
 
@@ -24,26 +28,54 @@ $(function() {
                 $.pjax({url: url, container:'#target'});
             }
         }
+        */
     };
 
-    conf2 = $.extend(true, {}, config);  // copy dictionary
-    conf2.onSelect = null;
+    //conf2 = $.extend(true, {}, config);  // copy dictionary
+    //conf2.onSelect = null;
         
     $(document).ready(function(){
-        $('#from.datepicker').Zebra_DatePicker(config);
-        $('#until.datepicker').Zebra_DatePicker(config);
         $(document).trigger('pjax:end');
     })
 
     $(document).on('pjax:end', function() {
-        $('#search').trigger('change');
-        $('#sidebar .datepicker').Zebra_DatePicker(conf2);
+        // Activate datepicker
+        $('.datepicker').Zebra_DatePicker(config);
 
-        // Highlight fields for flashed messages
-        $('.highlight').removeClass('highlight');
-        $('#flash li').each( function(){
+        // If all inputs are filled within an autosend-span, an url gets called
+        $('.autosend').on('change', 'input,select,textarea', function(){
+            var as = $(this).parents('.autosend');
+            var url = as.data('target');
+            var complete = true;
+            var sync = as.data('sync');
+            as.find('input,select,textarea').each( function() {
+                var name = $(this).attr('name');
+                if (name == undefined){ return }
+                var val = $(this).val();
+                if (val == ''){
+                    complete = false;
+                    return
+                }
+                url = url.replace('['+name+']', val.replace(/ /g, '_'));
+                
+                // Feature: Sync fields with identical name
+                if (sync){
+                    $('[name="'+name+'"]').val(val);
+                }
+            });
+
+            if (complete){
+                $.pjax({url: url, container:'#target'});
+            }
+        });
+        $('#search').trigger('change');
+
+        // Distribute flashed messages
+        $('#flashs .flash').each( function(){
             var sel = $(this).data('selector');
-            $(sel).addClass('highlight');
+            if (sel != 'message'){
+                $(sel).after($(this));
+            }
         });
     })
         

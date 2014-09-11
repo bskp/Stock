@@ -87,6 +87,7 @@ header{
 
     h1{
         margin-top: 0;
+        line-height: 1.2em;
     }
 
     h2{
@@ -95,13 +96,8 @@ header{
         margin-bottom: 0;
     }
 
-    h1 + h2{
-        margin-top: -1em;
-    }
-
     #description{
         font-style: italic;
-        width: 423px;
     }
 
     img{
@@ -124,7 +120,7 @@ header{
 }
 
 
-#flash{
+#flashs{
     position: fixed;
     bottom: 0;
     background-image: url('/static/img/laempel.png');
@@ -132,35 +128,59 @@ header{
     height: 400px;
     width: 300px;
 
-    ul{
+    div{
         background-color: @white;
         position: relative;
         left: 300px;
         top: -50px;
-        width: 200px;
+        display: inline-block;
+        max-width: 200px;
         border-radius: 99px;
-        padding: 2em 0;
-        box-shadow: white 0 1px 20px 25px;
+
+        padding: 2em;
+        box-shadow: black 0 6px;
+        border: 2px solid black;
+        font-weight: bold;
+        text-align: center;
+        list-style-type: none;
 
         font-weight: bold;
         text-align: center;
         list-style-type: none;
 
-        li + li{
-            margin-top: 1em;
+        div + div{
+            margin-top: 3em;
         }
     }
 }
 
-// Flashs can highlight elements:
+#sidebar .flash{
+    margin-top: -32px;
+    position: absolute;
+    right: 480px;
+    background-color: @alt;
+    padding: 0.5em 1em;
+    border-radius: 4px;
+    z-index: 5;
 
-.highlight{
-    header &{
-        background-color: rgba(255, 255, 255, 0.34) !important;
+    &:after{
+        content: '\f0da';
+        font-family: FontAwesome;
+        display: block;
+        font-size: 40px;
+        position: absolute;
+        right: -10px;
+        top: 1px;
+        color: @alt;
     }
-    #sidebar &{
-        background-color: rgba(0, 0, 0, 0.34);
+
+    a:hover i{
+        color: white;
     }
+}
+
+tr.invalid{
+    text-decoration: line-through;
 }
 
 
@@ -195,16 +215,6 @@ body,html{ height: 100%; }
 
 body{
     font-family: gyro;
-}
-
-h1,h2,h3{
-}
-
-
-h1{
-}
-
-h2{
 }
 
 a{
@@ -434,7 +444,7 @@ ul.items{
 } // ul.items
 
 
-sup {
+sup{
     font-size: 28px;
     line-height: 1em;
     display: inline-block;

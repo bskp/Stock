@@ -43,9 +43,11 @@
                 <option {{ ta.group|option('ext') }}>Externe</option>
             </select></span>
             verfügbar vom
-            <input type="text" class="datepicker" value="{{ ta.date_start|date }}" name="from" id="from">
-            bis
-            <input type="text" class="datepicker" value="{{ ta.date_end|date }}" name="until" id="until">
+            <span class="autosend" data-target="/filter/between/[date_start]/and/[date_end]">
+                <input type="text" class="datepicker" value="{{ ta.date_start|date }}" name="date_start" id="from">
+                bis
+                <input type="text" class="datepicker" value="{{ ta.date_end|date }}" name="date_end" id="until">
+            </span>
 
             <a class="reset" data-target=".datepicker,#list_category" data-url="/filter/none"><i class="icon-remove-sign"></i></a>
             {% endblock %}

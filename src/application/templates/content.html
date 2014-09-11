@@ -69,12 +69,10 @@ Die kriegst du per Mail, sobald Oli sich das angeschaut hat (wÃ¤hrend den Rast-Ã
 {% endif %}
 
 {% if get_flashed_messages() %}
-<aside id="flash">
-    <ul>
+<aside id="flashs">
     {% for selector, message in get_flashed_messages(with_categories=True) %}
-        <li data-selector="{{ selector }}">{{ message }}</div>
+        <div class="flash" data-selector="{{ selector }}">{{ message|safe }}</div>
     {% endfor %}
-    </ul>
 </aside>
 {% endif %}
 

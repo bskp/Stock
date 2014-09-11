@@ -4,13 +4,16 @@
     <h1>Bestellung abschliessen</h1>
 
     <h2>Verleihdauer</h2>
-    {{ ta.date_start|date }} bis {{ ta.date_end|date }}<br />
+    <span class="autosend" data-sync="true" data-target="/filter/between/[date_start]/and/[date_end]">
+        <input name="date_start" class="datepicker" value="{{ ta.date_start|date }}" /> bis 
+        <input name="date_end" class="datepicker" value="{{ ta.date_end|date }}" /><br />
+    </span>
     {{ ta.weeks }} Wochen / {{ ta.days }} Tage<br />
     <table class="receipt">
         {% if ta.lend %}
         <tr class="head"><td>Miete</td><td>Tarif</td><td>Dauer</td><td>Stück</td></tr>
         {% for il in ta.lend.values() %}
-        <tr>
+        <tr {{ 'class=invalid id=lend_'+il.item.id if not il.valid() else '' }}>
             <td>{{ il.item.name }}</td>
             <td>
                 {% if il.item.tax_base() %}{{ il.item.tax_base()|cash }} + {% endif %}
@@ -39,6 +42,14 @@
     </table>
 
     <h2>Deine Angaben</h2>
+    <span class="autosend" data-sync="true" data-target="/filter/group/[group]">
+    <label class="fill">Gruppe
+    <span class="select"><select name="group" id="list_group">
+        <option {{ ta.group|option('int') }}>Jubla-Schar</option>
+        <option {{ ta.group|option('edu') }}>Schule</option>
+        <option {{ ta.group|option('ext') }}>Extern</option>
+    </select></span></label>
+    </span>
     <label class="fill">Name <input name="name" value="{{ ta.name|default('', True) }}" /></label>
     <label class="fill">Email <input name="email" value="{{ ta.email|default('', True) }}" /></label>
     <label class="fill">Telefon <input name="tel" value="{{ ta.tel|default('', True) }}" /></label>
