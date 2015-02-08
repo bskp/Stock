@@ -341,7 +341,9 @@ def cart_checkout():
         flash(u'Gib einen Zeitraum für deine Bestellung an!', '#sidebar .datepicker:first-child')
     else:
         for li in ta.lend.values():
-            if not li.valid():
+            if not li.item.lendable:
+                flash(u'Für die gewählte Nutzergruppe leider nicht verfügbar. <a href="%s"><i class="icon-undo"></i> zurücklegen</a>?' % url_for('item_unlend', id=li.item.id), '#lend_'+li.item.id)
+            elif not li.valid():
                 flash(u'Nicht mehr verfügbar. <a href="%s"><i class="icon-calendar"></i> Daten checken</a> oder <a href="%s"><i class="icon-undo"></i> zurücklegen</a>?' % (url_for('check_stock', id=li.item.id), url_for('item_unlend', id=li.item.id)), '#lend_'+li.item.id)
 
     return pjax('checkout.html')

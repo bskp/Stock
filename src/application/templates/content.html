@@ -56,7 +56,7 @@ Die kriegst du per Mail, sobald Oli sich das angeschaut hat (während den Rast-�
 </section>
 
 {% if logged_in %}
-{% block admin %}
+{% block topmenu %}
 <div id="admin">
     <span>CHEF-MODUS</span>
     <a href="{{ url_for('logout') }}"><i class="icon-eject"></i></a>
@@ -68,9 +68,8 @@ Die kriegst du per Mail, sobald Oli sich das angeschaut hat (während den Rast-�
 {% if ta.n_in_cart > 0 %}
 {% block cart %}
 <aside id="cart">
-    {{ ta.n_in_cart }}×<i class="icon-shopping-cart"></i>
-    <a href="{{ url_for('cart_empty') }}">Leeren</a>
-    <a href="{{ url_for('cart_checkout') }}" style="float: right;">Adresse angeben & bestellen <i class="icon-chevron-right"></i></a>
+    {#<a href="{{ url_for('cart_empty') }}">Leeren</a>#}
+    <a href="{{ url_for('cart_checkout') }}" style="float: right;">{{ ta.n_in_cart }}×<i class="icon-shopping-cart"></i> Bestellen…</i></a>
 </aside>
 {% endblock %}
 {% endif %}

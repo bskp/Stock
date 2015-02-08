@@ -21,11 +21,9 @@ app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 def jinja_cash(amount):
     if not amount:
         return 'gratis'
-    big, small = str(amount).split('.')
-    if small == '0':
+    big, small = ('%.2f' % amount).split('.')
+    if small == '00':
         small = '-'
-    else:
-        small = '%02i' % int(small)
     return '%s,%s' % (big, small)
 app.jinja_env.filters['cash'] = jinja_cash
 

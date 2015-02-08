@@ -1686,67 +1686,13 @@ header select:-ms-input-placeholder {
 tr.invalid {
   text-decoration: line-through;
 }
-#admin {
+#cart {
   position: absolute;
   top: 0;
-  font-size: 1.4em;
+  font-size: 1.2em;
   right: 0.5em;
   color: #000000;
   background-color: #00a7db;
-}
-#admin a,
-#admin input,
-#admin select {
-  color: #ffffff;
-}
-#admin a:hover,
-#admin input:hover,
-#admin select:hover {
-  color: #000000;
-}
-#admin a:hover i,
-#admin input:hover i,
-#admin select:hover i {
-  color: #ffffff;
-}
-#admin input,
-#admin select {
-  border-bottom: 2px solid #ffffff;
-  background: transparent;
-}
-#admin input::-webkit-input-placeholder,
-#admin select::-webkit-input-placeholder {
-  /* WebKit browsers */
-
-  color: #000000;
-}
-#admin input:-moz-placeholder,
-#admin select:-moz-placeholder {
-  /* Mozilla Firefox 4 to 18 */
-
-  color: #000000;
-}
-#admin input::-moz-placeholder,
-#admin select::-moz-placeholder {
-  /* Mozilla Firefox 19+ */
-
-  color: #000000;
-}
-#admin input:-ms-input-placeholder,
-#admin select:-ms-input-placeholder {
-  /* Internet Explorer 10+ */
-
-  color: #000000;
-}
-#cart {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.2em 1em;
-  color: #000000;
-  background-color: #00a7db;
-  font-size: 20px;
 }
 #cart a,
 #cart input,
@@ -1797,6 +1743,63 @@ tr.invalid {
 }
 #cart a {
   margin-left: 1em;
+}
+#admin {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.2em 1em;
+  color: #000000;
+  background-color: #00a7db;
+  font-size: 20px;
+}
+#admin a,
+#admin input,
+#admin select {
+  color: #ffffff;
+}
+#admin a:hover,
+#admin input:hover,
+#admin select:hover {
+  color: #000000;
+}
+#admin a:hover i,
+#admin input:hover i,
+#admin select:hover i {
+  color: #ffffff;
+}
+#admin input,
+#admin select {
+  border-bottom: 2px solid #ffffff;
+  background: transparent;
+}
+#admin input::-webkit-input-placeholder,
+#admin select::-webkit-input-placeholder {
+  /* WebKit browsers */
+
+  color: #000000;
+}
+#admin input:-moz-placeholder,
+#admin select:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+
+  color: #000000;
+}
+#admin input::-moz-placeholder,
+#admin select::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+
+  color: #000000;
+}
+#admin input:-ms-input-placeholder,
+#admin select:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+
+  color: #000000;
+}
+#admin i {
+  font-size: 1.2em;
 }
 body,
 html {
