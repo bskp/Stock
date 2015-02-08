@@ -1,3 +1,6 @@
+{% set gone=['schon weg', 'zu spät!', 'ein andermal', 'schön wärs', 'leider nein', 'verpennt!', 'sorry', 'nicht mehr', 'bin weg'] %}
+
+
 <aside id="sidebar">
 {% block sidebar %}
 <img src="{{url_for('static', filename='img/rastlogo.png')}}" style="display: block; margin: 1em auto"/>
@@ -23,13 +26,14 @@ Die kriegst du per Mail, sobald Oli sich das angeschaut hat (während den Rast-�
         {% endif %}
             <a href="{{ url_for('item', id=litem.id) }}"
             title="{{ litem.description }}"
-            {% if litem.gone %} class="gone" {% endif %}
+            {% if litem.gone %} class="gone"{% endif %}
             
             style="background-image: url('/uploads/{{ litem.id }}.jpg');">
             {% if litem.lending>0 %}<sup>{{ litem.lending }}</sup>{% endif %}
             {% if litem.buying>0 %}<sup class="buy">{{ litem.buying }}</sup>{% endif %}
             <span>{{ litem.name }}</span>
 
+            {% if litem.gone %}<em>{{ gone|random }}</em>{% endif %}
             </a>
         </li>
         {% endfor %}

@@ -2044,7 +2044,7 @@ ul.items li a.hidden {
 ul.items li a.gone {
   opacity: 0.3;
 }
-ul.items li a.gone:after {
+ul.items li a.gone em {
   position: relative;
   -webkit-transform: rotate(45deg);
   -moz-transform: rotate(45deg);
@@ -2057,9 +2057,10 @@ ul.items li a.gone:after {
   height: 1.5em;
   line-height: 1.5em;
   margin-top: -1.5em;
-  content: "bereits weg";
+  content: attr('data-gone');
   text-transform: uppercase;
   font-weight: bold;
+  font-style: normal;
   color: #ffffff;
   font-size: 14px;
   background-color: #00a7db;

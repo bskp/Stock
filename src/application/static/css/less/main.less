@@ -442,7 +442,7 @@ ul.items{
         }
 
         a.gone{
-            &:after{
+            em{
                 position: relative;
                 .transform(rotate(45deg));
                 bottom: 90px;
@@ -453,9 +453,10 @@ ul.items{
                 line-height: 1.5em;
                 margin-top: -1.5em;
 
-                content: "bereits weg";
+                content: attr('data-gone');
                 text-transform: uppercase;
                 font-weight: bold;
+                font-style: normal;
                 color: @white;
                 font-size: 14px;
                 background-color: @accent;
