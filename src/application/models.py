@@ -95,7 +95,7 @@ class Item(db.Model):
 
     @property
     def available(self):
-        return self.count - self.buying - self.lending
+        return self.count - self.lending
 
 
     @property
@@ -130,17 +130,6 @@ class Item(db.Model):
         if self.tax_base(ta) is None or self.tax(ta) is None:
             return -1.0
         return self.tax_base(ta) + periods*self.tax(ta)
-
-
-    def valid_buy(self, transaction):
-        amount = 0
-        if self.id in transaction.buy:
-            amount = transaction.buy[self.id].amount
-        if self.buyable \
-        and transaction.date_start and transaction.date_end \
-        and self.in_stock(transaction.date_start, transaction.date_end) >= amount:
-            return True
-        return False
 
 
 

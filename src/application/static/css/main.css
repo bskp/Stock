@@ -1626,6 +1626,7 @@ header select:-ms-input-placeholder {
 #sidebar .navi {
   float: right;
   margin-top: 0.5em;
+  margin-left: 0.5em;
 }
 #sidebar .navi:hover {
   text-decoration: none;
@@ -2039,6 +2040,32 @@ ul.items li.selected a {
 }
 ul.items li a.hidden {
   opacity: 0.2;
+}
+ul.items li a.gone {
+  opacity: 0.3;
+}
+ul.items li a.gone:after {
+  position: relative;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  bottom: 90px;
+  left: 30px;
+  display: block;
+  height: 1.5em;
+  line-height: 1.5em;
+  margin-top: -1.5em;
+  content: "bereits weg";
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #ffffff;
+  font-size: 14px;
+  background-color: #00a7db;
+}
+ul.items li a.gone:hover {
+  text-decoration: none;
 }
 sup {
   font-size: 28px;

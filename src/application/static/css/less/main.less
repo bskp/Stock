@@ -107,6 +107,7 @@ header{
     .navi{
         float: right;
         margin-top: 0.5em;
+        margin-left: 0.5em;
 
         &:hover{
             text-decoration: none;
@@ -438,6 +439,30 @@ ul.items{
 
         a.hidden{
             opacity: 0.2;
+        }
+
+        a.gone{
+            &:after{
+                position: relative;
+                .transform(rotate(45deg));
+                bottom: 90px;
+                left: 30px;
+                display: block;
+                
+                height: 1.5em;
+                line-height: 1.5em;
+                margin-top: -1.5em;
+
+                content: "bereits weg";
+                text-transform: uppercase;
+                font-weight: bold;
+                color: @white;
+                font-size: 14px;
+                background-color: @accent;
+
+            }
+            &:hover{ text-decoration: none; }
+            opacity: 0.3;
         }
 
     } // li

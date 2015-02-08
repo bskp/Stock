@@ -50,7 +50,11 @@ def calendar(item, month_offset=0):
 
 
 # LAZYNESS HELPERS
-request_or_none = lambda key: request.form.get(key) if request.form.get(key) else None
+def request_or_none(key):
+    val = request.form.get(key)
+    if val or val == '0':
+        return val
+    return None
 
 def session_or_empty(key):
     if key in session:
@@ -125,6 +129,9 @@ def pjax(template, **kwargs):
 
     ta = g.ta
 
+    for item in items:
+        item.gone=False  # Prepare a flag for availability
+
     # Filter by group
     if ta.group and not 'logged_in' in session:
         items = filter(lambda i: i.buyable or i.lendable, items)
@@ -141,7 +148,7 @@ def pjax(template, **kwargs):
                 if item.id in colliding_ta.lend:
                     gone += colliding_ta.lend[item.id].amount
                 if gone >= item.count and item in items:
-                    items.remove(item)
+                    item.gone=True
 
 
     # Safe referrer explicitly to session as request.referer did not work
@@ -151,6 +158,7 @@ def pjax(template, **kwargs):
     kwargs['items'] = items
     kwargs['ta'] = ta
 
+    # Pjax fork
     if "X-PJAX" in request.headers:
         return render_template(template, **kwargs)
     
@@ -163,6 +171,14 @@ def pjax(template, **kwargs):
 
 def same():
     ''' Keep the user on the current view, but refresh it. '''
+
+    '''
+    @after_this_request
+    def add_header(response):
+        response.headers['X-PJAX'] = '#target'
+        return response
+    '''
+
     return redirect( session['referrer'] )
 
 
@@ -326,7 +342,7 @@ def cart_checkout():
     else:
         for li in ta.lend.values():
             if not li.valid():
-                flash(u'Für die gewählte Periode nicht an Lager <a href="%s"><i class="icon-calendar"></i></a>' % url_for('check_stock', id=li.item.id), '#lend_'+li.item.id)
+                flash(u'Nicht mehr verfügbar. <a href="%s"><i class="icon-calendar"></i> Daten checken</a> oder <a href="%s"><i class="icon-undo"></i> zurücklegen</a>?' % (url_for('check_stock', id=li.item.id), url_for('item_unlend', id=li.item.id)), '#lend_'+li.item.id)
 
     return pjax('checkout.html')
 
@@ -347,7 +363,7 @@ def cart_submit():
     ok = True
     for li in ta.lend.values():
         if not li.valid():
-            flash(u'Für die gewählte Periode nicht an Lager <a href="%s"><i class="icon-calendar"></i></a>' % url_for('check_stock', id=li.item.id), '#lend_'+li.item.id)
+            flash(u'Für die gewählte Verleihdauer nicht an Lager <a href="%s"><i class="icon-calendar"></i></a>' % url_for('check_stock', id=li.item.id), '#lend_'+li.item.id)
             ok = False
 
     # Validate fields
