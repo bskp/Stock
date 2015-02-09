@@ -171,14 +171,6 @@ def pjax(template, **kwargs):
 
 def same():
     ''' Keep the user on the current view, but refresh it. '''
-
-    '''
-    @after_this_request
-    def add_header(response):
-        response.headers['X-PJAX'] = '#target'
-        return response
-    '''
-
     return redirect( session['referrer'] )
 
 

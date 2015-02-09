@@ -144,7 +144,7 @@ $(function() {
         }
     });
 
-    $('.completion').on('keyup', function(e) {
+    $('body').on('keyup', '.completion', function(e) {
         var items = $(this).data('items').split(' ');
         var current_input = $(this).val().match(/[^, ]*$/)[0];
         if (current_input == '' || e.keyCode == 8){ return; }
