@@ -68,8 +68,9 @@ Die kriegst du per Mail, sobald Oli sich das angeschaut hat (während den Rast-�
 {% if ta.n_in_cart > 0 %}
 {% block cart %}
 <aside id="cart">
-    {#<a href="{{ url_for('cart_empty') }}">Leeren</a>#}
-    <a href="{{ url_for('cart_checkout') }}" style="float: right;">{{ ta.n_in_cart }}×<i class="icon-shopping-cart"></i> Bestellen…</i></a>
+    {{ ta.n_in_cart }}×<i class="icon-shopping-cart"></i>
+    <a href="{{ url_for('cart_empty') }}">Leeren</a>
+    <a href="{{ url_for('cart_checkout') }}" style="float: right;">Zur Kasse</i></a>
 </aside>
 {% endblock %}
 {% endif %}

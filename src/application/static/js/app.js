@@ -15,24 +15,7 @@ $(function() {
         onSelect: function(){
             $(this).trigger('change');
         }
-        /*
-        onSelect: function(){
-            var from = $('#from').val();
-            var until = $('#until').val();
-
-            from = from.replace(/ /g, '_');
-            until = until.replace(/ /g, '_');
-
-            if (from && until){
-                var url = '/filter/between/'+from+'/and/'+until; 
-                $.pjax({url: url, container:'#target'});
-            }
-        }
-        */
     };
-
-    //conf2 = $.extend(true, {}, config);  // copy dictionary
-    //conf2.onSelect = null;
         
     $(document).ready(function(){
         $(document).trigger('pjax:end');
@@ -41,6 +24,15 @@ $(function() {
     $(document).on('pjax:end', function() {
         // Activate datepicker
         $('.datepicker').Zebra_DatePicker(config);
+
+        // Distribute stickers
+        
+        $('.sticker').each( function() {
+            $(this).css({'top': Math.random()*300+150+'px',
+                         'right': Math.random()*300+20+'px',
+                         'transform': 'rotate('+Math.random()*360+'deg)' });
+        });
+
 
         // If all inputs are filled within an autosend-span, an url gets called
         $('.autosend').on('change', 'input,select,textarea', function(){

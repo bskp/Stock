@@ -42,7 +42,7 @@ body{
         &:hover{
             color: @black;
             
-            i{ color: @white; }
+            i{ color: @black; }
         }
     }
     input, select{
@@ -50,6 +50,15 @@ body{
         background: transparent;
         .placeholder(@black);
     }
+}
+
+
+.lend{
+    background-color: @accent;
+}
+
+.buy{
+    background-color: @alt;
 }
 
 
@@ -81,7 +90,7 @@ header{
     min-height: 100%;
     padding: 1em;
     padding-top: 0.5em;
-    padding-bottom: 50px;
+    padding-bottom: 80px;
     
     border-left: solid 1px rgba(0, 0, 0, 0.1);
 
@@ -186,11 +195,16 @@ tr.invalid{
 
 
 #cart{
-    position: absolute;
-    top: 0;
+    position: fixed;
+    bottom: 0;
     font-size: 1.2em;
-    right: 0.5em;
-    .on_accent;
+    right: 0;
+
+    padding: 0.5em 1em;
+    width: 417px;
+    border-top: 1px dashed;
+    background-color: @white;
+
     i { font-size: 1.2em; }
     a { margin-left: 1em; }
 }
@@ -199,7 +213,6 @@ tr.invalid{
     position: fixed;
     bottom: 0;
     left: 0;
-    right: 0;
     padding: 0.2em 1em;
     .on_accent;
 
@@ -245,6 +258,7 @@ textarea, input, select{
     .fill &{
         width: 300px;
         float: right;
+        margin-bottom: 4px;
     }
     .fill span &{
         width: 302px;
@@ -397,24 +411,6 @@ ul.items{
             // Hide unrounded corners of the span
             overflow: hidden;
             
-            i { // cart amount indicator
-                font-style: normal;
-                font-size: 16px;
-                position: relative;
-                display: inline-block;
-                left: 53px;
-                top: 13px;
-                height: 1.5em;
-                width: 1.5em;
-
-                color: white;
-                background-color: @accent;
-                border: solid 2px @white;
-
-                .border-radius(99px);
-                //.transform(rotate(14deg));
-            }
-
             span {
                 width: 100%;
                 display: inline-block;
@@ -452,7 +448,6 @@ ul.items{
                 line-height: 1.5em;
                 margin-top: -1.5em;
 
-                content: attr('data-gone');
                 text-transform: uppercase;
                 font-weight: bold;
                 font-style: normal;
@@ -475,14 +470,37 @@ sup{
     display: inline-block;
 
     color: @white;
-    background-color: @accent;
     .border-radius(50px);
     padding: 0 0.3em 0.15em 0.3em;
     border: 2px solid  @white;
     margin: -1em -0.25em;
 
-    &.buy{ background-color: @alt; }
+    background-color: @accent;
 }
+
+
+.sticker{
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    .border-radius(150px);
+
+    border: 4px solid white;
+    overflow: hidden;
+
+    span{
+        text-align: center;
+        display: block;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: @white;
+        text-align: center;
+        margin-top: 60px;
+        font-size: 28px;
+        line-height: 1em;
+    }
+}
+
 
 
 table{

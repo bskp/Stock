@@ -48,6 +48,14 @@
         {% endif %}
     {% endif %}
 
+    {% for i in range(item.lending) %}
+    <div class="sticker lend"><span>geliehen!</span></div>
+    {% endfor %}
+    {% for i in range(item.buying) %}
+    <div class="sticker buy"><span>gekauft!</span></div>
+    {% endfor %}
+
+
     {% if item.related %}
     <h2>Oli empfiehlt dazu:</h2>
     <ul>
