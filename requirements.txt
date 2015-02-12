@@ -1,0 +1,12 @@
+# Development environment pip requirements file
+# Install with 'make deps' or 'pip install -r requirements.txt'
+
+Pillow
+jinja2
+simplejson
+Flask
+SQLAlchemy
+Flask-SQLAlchemy
+Flask-Mail
+unidecode
+pycrypto
