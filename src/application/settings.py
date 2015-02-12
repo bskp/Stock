@@ -10,7 +10,7 @@ Important: Place your keys in the secret_keys.py module,
 
 import os
 
-from secret_keys import CSRF_SECRET_KEY, SESSION_KEY
+from secret_keys import CSRF_SECRET_KEY, SESSION_KEY, EMAIL_PASSWORD
 
 DEBUG = True
 
@@ -24,13 +24,13 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///../sqlite.db'
 PASSWORD = '0815'
 
 # Locale to use for frontend
-LOCALE = 'de_CH'
+LOCALE = 'de_CH.utf-8'
 
 # Email settings
 EMAIL_ADDRESS = 'rast@jubla-freiburg.ch'
 EMAIL_SERVER = 'mail.senselan.ch'
 EMAIL_PORT = 465
-EMAIL_PASSWORD = 'itreck'
+# The email password is set in secret_keys.py
 
 
 # Set secret keys for CSRF protection

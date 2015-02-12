@@ -31,7 +31,7 @@ app.jinja_env.filters['cash'] = jinja_cash
 def jinja_date(dt_obj):
     if dt_obj is None or dt_obj == []:
         return ''
-    return dt_obj.strftime(u'%d. %b %Y')
+    return dt_obj.strftime(u'%d. %b %Y').decode('utf-8')
 app.jinja_env.filters['date'] = jinja_date
 
 

@@ -1,13 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="110px" height="110px" viewBox="0 0 110 110" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <title>Artboard 1</title>
-    <description>Created with Sketch (http://www.bohemiancoding.com/sketch)</description>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="Artboard-1" sketch:type="MSArtboardGroup" font-size="77" font-family="FontAwesome" fill="#E3E3E3" font-weight="normal">
-            <text id="" sketch:type="MSTextLayer">
-                <tspan x="25" y="75"></tspan>
-            </text>
-        </g>
-    </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="create_bg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="110px" height="110px" viewBox="0 0 110 110" xml:space="preserve">
+    <path fill="#E3E3E3" d="M85.5,48.875c0,2.277-1.848,4.125-4.125,4.125H63.5v17.875c0,2.277-1.848,4.125-4.125,4.125h-8.25
+				C48.848,75,47,73.152,47,70.875V53H29.125C26.848,53,25,51.152,25,48.875v-8.25c0-2.277,1.848-4.125,4.125-4.125H47V18.625
+				c0-2.277,1.848-4.125,4.125-4.125h8.25c2.277,0,4.125,1.848,4.125,4.125V36.5h17.875c2.277,0,4.125,1.848,4.125,4.125V48.875z"/>
 </svg>

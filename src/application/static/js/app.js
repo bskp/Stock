@@ -19,47 +19,21 @@ $(function() {
         
     $(document).ready(function(){
         $(document).trigger('pjax:end');
+        $('header .datepicker').Zebra_DatePicker(config);
     })
 
+    // Document-Ready with pjax
     $(document).on('pjax:end', function() {
-        // Activate datepicker
-        $('.datepicker').Zebra_DatePicker(config);
+        // Activate datepickers in reloaded area
+        $('#target .datepicker').Zebra_DatePicker(config);
 
         // Distribute stickers
-        
         $('.sticker').each( function() {
             $(this).css({'top': Math.random()*300+150+'px',
                          'right': Math.random()*300+20+'px',
                          'transform': 'rotate('+Math.random()*360+'deg)' });
         });
 
-
-        // If all inputs are filled within an autosend-span, an url gets called
-        $('.autosend').on('change', 'input,select,textarea', function(){
-            var as = $(this).parents('.autosend');
-            var url = as.data('target');
-            var complete = true;
-            var sync = as.data('sync');
-            as.find('input,select,textarea').each( function() {
-                var name = $(this).attr('name');
-                if (name == undefined){ return }
-                var val = $(this).val();
-                if (val == ''){
-                    complete = false;
-                    return
-                }
-                url = url.replace('['+name+']', val.replace(/ /g, '_'));
-                
-                // Feature: Sync fields with identical name
-                if (sync){
-                    $('[name="'+name+'"]').val(val);
-                }
-            });
-
-            if (complete){
-                $.pjax({url: url, container:'#target'});
-            }
-        });
         $('#search').trigger('change');
 
         // Distribute flashed messages
@@ -72,9 +46,9 @@ $(function() {
     })
         
     
-    // Provide "deselecting"/
+    // Provide deselecting
     $(document).on('click', 'body', function(e){
-        if (e.target.nodeName == 'BODY'){ // filter out all delegated events
+        if (e.target.nodeName == 'BODY'){  // test for un-bubbled events
             $.pjax({url: '/', container:'#target'});
         }
     }); 
@@ -84,7 +58,6 @@ $(function() {
         fuzzy = function(needle, hay){
             return hay.toLowerCase().search(needle.toLowerCase()) > -1
         }
-
         $('.items li a').each(function(){
             self = $(this);
             hit = query == '' || fuzzy(query, self.attr('title')) || fuzzy(query, self.text());
@@ -96,28 +69,21 @@ $(function() {
         });
     }
 
+    // Search field
     $('#search').on('change paste keyup', function(e) {
         var search = $(this)
         if (e.keyCode == 27) { // Escape
             search.val('');
             search.blur();
-            search_list( $(this).val() );
+            search_list( '' );
         }
         else if (e.keyCode == 13) { // Enter
             search.blur();
         } else {
-            search_list( $(this).val() );
+            search_list( search.val() );
         }
     });
     
-    $('#list_category').on('change', function(e) {
-        if ($(this).val()){
-            url = '/filter/category/'+$(this).val();
-        } else {
-            url = '/filter/category/all';
-        }
-        $.pjax({url: url, container:'#target'});
-    });
 
     $('#list_group').on('change', function(e) {
         url = '/filter/group/'+$(this).val();
@@ -126,15 +92,58 @@ $(function() {
 
 
     $('.reset').on('click', function(e) {
-        var t = $(this).data('target');
-        $(t).val('');
-        $(t).trigger('change');
+        var t = $( $(this).data('target') );
+        t.val('');
+        t.filter('select').each( function() {
+            var val = $(this).children().first().val();
+            $(this).val( val );
+        });
+        t.trigger('change');
 
         var url = $(this).data('url');
         if (url){
             $.pjax({url: url, container:'#target'});
         }
     });
+
+    
+    //
+    // Delegated Event Handlers
+    //
+
+
+    // Autosend
+    //
+
+    $('body').on('change', '.autosend input, .autosend select, .autosend textarea', function(){
+        var as = $(this).parents('.autosend');
+        var url = as.data('target');
+        var complete = true;
+        var sync = as.data('sync');
+        as.find('input,select,textarea').each( function() {
+            var name = $(this).attr('name');
+            if (name == undefined){ return }
+            var val = $(this).val();
+            if (val == ''){
+                complete = false;
+                return
+            }
+            url = url.replace('['+name+']', val.replace(/ /g, '_'));
+            
+            // Feature: Sync fields with identical name
+            if (sync){
+                $('[name="'+name+'"]').val(val);
+            }
+        });
+
+        if (complete){
+            $.pjax({url: url, container:'#target'});
+        }
+    });
+
+
+    // Autocompletion
+    //
 
     $('body').on('keyup', '.completion', function(e) {
         var items = $(this).data('items').split(' ');

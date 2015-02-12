@@ -120,12 +120,12 @@ def pjax(template, **kwargs):
     '''
 
     # Filter by category
-    category=''
-    if 'category' in session:
-        category = session['category']
-        items = Item.query.filter_by(category=category)
-    else:
+    category = session_or_empty('category') or 'all'
+
+    if category == 'all':
         items = Item.query.order_by('name').all()
+    else:
+        items = Item.query.filter_by(category=category)
 
     ta = g.ta
 
@@ -198,9 +198,6 @@ def send_file(filename):
 
 @app.route('/filter/category/<string:category>')
 def cat_filter(category):
-    if category == 'all':
-        session.pop('category')
-        return same()
     if not category in CATEGORIES:
         flash(u'Kategorie "%s" ungültig!' % category)
     else:
@@ -223,7 +220,7 @@ def date_filter(start, end):
 
     def parse_date(string):
         try:
-            return datetime.datetime.strptime(string, '%d._%b_%Y')
+            return datetime.datetime.strptime(string.encode('utf-8'), '%d._%b_%Y')
         except ValueError:
             flash(u'"%s" ist emfall kein gültiges Datum!' % string)
             return None
@@ -518,7 +515,6 @@ def item_post(id=None):
         image = image.crop(resize).resize((140, 140), i.ANTIALIAS)
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename), "jpeg")
 
-    #flash('%s gesichert.'%itm.name)
     return redirect( url_for('item', id=id) )
 
 

@@ -28,8 +28,8 @@
             <a class="reset" data-target="#search" style="float:right;"><i class="icon-remove-sign"></i></a>
             <input id="search" style="float:right;" type="text" placeholder="Suche"/>
 
-            <span class="select"><select name="category" id="list_category">
-                <option {{ category|option() }}>Alle Artikel</option>
+            <span class="select autosend" data-target="/filter/category/[category]"><select name="category" id="list_category">
+                <option {{ category|option('all') }}>Alle Artikel</option>
                 <option {{ category|option('outdoor') }}>Spielmaterial draussen</option>
                 <option {{ category|option('indoor') }}>Spielmaterial drinnen</option>
                 <option {{ category|option('vehicle') }}>Vehikel</option>
